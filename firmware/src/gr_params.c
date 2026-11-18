@@ -74,7 +74,7 @@ static inline int32_t gr_rand_bi(void)           /* -32768 .. 32767 */
 
 /* -------------------------------------------------------- parameters --- */
 static gr_pset_t gr_ps[NPART];
-static const uint8_t gr_kind[NPART] = {KIND_GRAIN, KIND_GRAIN, KIND_DRONE, KIND_PAD};
+static const uint8_t gr_kind[NPART] = {KIND_GRAIN, KIND_GRAIN, KIND_DRONE};
 static inline int gr_ambient(uint32_t part) { return gr_kind[part] != KIND_GRAIN; }
 /* the destinations an LFO of this part can pick from, and the names the screen shows for the destination cell */
 static inline const uint8_t *gr_dest_of(uint32_t part) { return gr_ambient(part) ? GR_ALFO_DEST : GR_LFO_DEST; }

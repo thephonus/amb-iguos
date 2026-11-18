@@ -1,5 +1,5 @@
 /* SPDX-License-Identifier: GPL-3.0-only
- * Host render of the Mini-Grain screens: every page to a PPM (tests/ui_png.py makes the PNGs).
+ * Host render of the amb-iguos screens: every section, page and layer to a PPM (tests/ui_png.py makes the PNGs).
  *   cc -O1 -Wall -Ifirmware/src -Ibuild/gen tests/host_ui.c -o build/host_ui -lm && build/host_ui build/ui */
 #include <stdint.h>
 #include <stdio.h>
@@ -13,7 +13,7 @@
 static uint32_t fm1_ms = 5000;
 static uint16_t fb[240 * 240];
 static uint32_t gr_midi_activity;
-#define FELUCCA_VERSION "Mini-Grain 0.1"
+#define FELUCCA_VERSION "amb-iguos 0.1"
 #define GR_YIELD() ((void)0)
 static void gr_render(int32_t *, int32_t *);
 static void fm1_wdt_feed(void) { int32_t l[128], r[128]; fm1_ms++; gr_render(l, r); }
@@ -47,18 +47,22 @@ static void lcd_fill(uint32_t x, uint32_t y, uint32_t w, uint32_t h, uint16_t c)
 #include "gr_drift.c"
 static void midi_out_event(uint32_t pkt) { (void)pkt; }
 #include "gr_seq.c"
-#define NSLOT 8u
+#define NSLOT 7u
+enum { LKE_OK, LKE_ARG };
 typedef struct { uint32_t magic, frames, rate, bytes, crc; char name[16]; uint32_t rsv, hcrc; } smp_hdr_t;
-static uint32_t smp_used = 0x105;
-static uint8_t gr_src_kind[2] = {1, 0}, gr_src_slot[2] = {2, 0};
+static uint32_t smp_used = 0x05;
+static uint8_t gr_src_kind[NPART], gr_src_slot[NPART];
 static int smp_hdr_read(uint32_t s, smp_hdr_t *h)
 {
-    static const char *const N[10] = {"kick_01", "", "Rhodes C4", "", "", "", "", "", "", "long_pad_name_2"};
+    static const char *const N[7] = {"lluvia_patio", "", "piano_viejo", "", "", "", ""};
     h->frames = 20000u + s * 4000u; h->rate = 22050 + s * 1000u;
     strcpy(h->name, N[s]);
     return 0;
 }
+static struct { uint8_t config, suspended; } usb = {0, 0};
 #include "gr_ui.c"
+static int32_t batt_level(void) { return 2; }
+static int32_t batt_pct(void) { return 64; }
 
 static int16_t smp_mem[NPART][SMP_FRAMES + 1];
 
@@ -78,21 +82,29 @@ static void save(const char *dir, const char *name)
     fclose(f);
 }
 
+static void run(uint32_t blocks)
+{
+    uint32_t b;
+    for (b = 0; b < blocks; b++) { int32_t l[128], r[128]; if (b % 8 == 0) amb_poll(); dr_block(); gr_render(l, r); }
+}
+
 static void settle(void)
 {
     int i;
-    for (i = 0; i < 3; i++) { fm1_ms += 700; ui_draw(); }
+    for (i = 0; i < 3; i++) { fm1_ms += 700; run(20); ui_draw(); }
 }
 
 int main(int argc, char **argv)
 {
     const char *dir = argc > 1 ? argv[1] : "build/ui";
-    uint32_t part, b, pg;
+    uint32_t part, sc;
     ui_theme_init();
     dial_init();
     gr_params_defaults();
     gr_gen_defaults();
     gr_engine_init();
+    gr_gen[0].type = GT_WAVETABLE;
+    gr_gen[1].type = GT_BOWWIND;
     for (part = 0; part < NGPART; part++) {
         gr_pt[part].smp.data = smp_mem[part];
         gr_sample_begin(part);
@@ -100,38 +112,35 @@ int main(int argc, char **argv)
         gr_sample_end(part, gr_gen_render(part, smp_mem[part]), GEN_RATE);
     }
     ui.saved_mask = 0x0825;
-    seq_init();
-    {   static const uint8_t N[16] = {60, 0, 63, 0, 67, 0, 65, 0, 60, 62, 0, 70, 72, 0, 67, 0};
-        uint32_t i; seq_step_t st;
-        for (i = 0; i < 16; i++) if (N[i]) { step_blank(&st); st.time = STT_NOTE; st.notes = 0xFFFFFF00u | N[i]; st.vel = i % 5 == 0 ? 127 : 90 - i; if (i == 4) st.ratchet = 3; if (i == 8) st.slide = 1; if (i == 12) { st.nudge = 9; st.fill = FILL_ONLY; } seq_set(0, i, &st); }
-        step_blank(&st); st.time = STT_TIE; seq_set(0, 5, &st); seq_set(0, 6, &st);
-        seq_set_lock(0, 2, P_CUTOFF, 30000);
-        ui.cursor[0] = 4; seq.playing = 1; seq.play_step[0] = 7; ui.arm_cell = -1;
-    }
-    gr_note_on(0, 60, 100); gr_note_on(0, 64, 100); gr_note_on(1, 72, 100);
-    amb_poll(); gr_note_on(2, 48, 100); gr_note_on(3, 55, 100); gr_note_on(3, 59, 100);
-    gr_set_norm(2, P_L1DEST, 65535 * 2 / 28); gr_set_norm(2, P_AMODDEPTH, 40000); gr_set_norm(3, P_ASTRUCT, 65535);
-    gr_set_norm(0, P_L1DEST, 65535 * 4 / 28);
-    gr_set_norm(0, P_FTYPE, 65535 * 2 / 4);
-    for (b = 0; b < 600; b++) { int32_t l[128], r[128]; if (b % 8 == 0) amb_poll(); gr_render(l, r); }
+    gr_set_norm(0, P_SIZE, 50000); gr_set_norm(0, P_DENSITY, 40000); gr_set_norm(0, P_SPREAD, 20000);
+    gr_set_norm(0, P_SHIMMER, 40000); gr_set_norm(0, P_MACRO3, 45000); gr_set_norm(0, P_MACRO1, 26000);
+    gr_set_norm(0, P_L1DEST, 65535 * 4 / 28); gr_set_norm(0, P_FTYPE, 65535 * 2 / 4);
+    gr_set_norm(0, P_DRATE, 4000); gr_set_norm(0, P_DDRONE, 65535);
+    amb_poll();
+    dr_on = 1;
+    run(6000);
     for (part = 0; part < NPART; part++) {
-        for (pg = 0; pg < PG_COUNT; pg++) {
-            uint32_t bank;
+        for (sc = 0; sc < SC_COUNT; sc++) {
+            uint32_t sub, n;
             char name[40];
-            ui.page = (uint8_t)pg; ui.part = (uint8_t)part; ui.force = 1;
-            ui.notice_ms = 0;
-            if (pg == PG_GEN) { }
-            for (bank = 0; bank < ui_nbanks(pg); bank++) {
-                ui.bank = (uint8_t)bank;
-                ui.turned[bank & 3] = fm1_ms;
+            ui.part = (uint8_t)part;
+            ui.page = (uint8_t)sc;
+            n = ui_npages(sc);
+            for (sub = 0; sub < n; sub++) {
+                ui.sub[sc] = (uint8_t)sub;
                 ui.force = 1;
-                { int32_t l[128], r[128]; for (b = 0; b < 20; b++) gr_render(l, r); }
-                fm1_ms += 100;
+                ui.notice_ms = 0;
+                ui.turned[sub & 3] = fm1_ms + 2100;            /* a dial being turned */
                 settle();
-                snprintf(name, sizeof name, "p%u_%u_%u", part, pg, bank);
+                snprintf(name, sizeof name, "s%u_%u_%u", part, sc, sub);
                 save(dir, name);
             }
         }
     }
+    /* the Freeze, on the scene */
+    dr_freeze_set(1);
+    ui.part = 0; ui.page = SC_ESCENA; ui.sub[SC_ESCENA] = 0; ui.force = 1;
+    settle();
+    save(dir, "freeze");
     return 0;
 }

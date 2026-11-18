@@ -82,10 +82,10 @@ class Link:
         except ImportError:
             sys.exit("needs mido: pip install mido python-rtmidi")
         self.mido = mido
-        outs = [n for n in mido.get_output_names() if "Mini-Grain" in n]
-        ins = [n for n in mido.get_input_names() if "Mini-Grain" in n]
+        outs = [n for n in mido.get_output_names() if "amb-iguos" in n or "Mini-Grain" in n]
+        ins = [n for n in mido.get_input_names() if "amb-iguos" in n or "Mini-Grain" in n]
         if not outs or not ins:
-            sys.exit("no Mini-Grain MIDI port found: connect the FM-1 (running Mini-Grain) by USB")
+            sys.exit("no amb-iguos MIDI port found: connect the FM-1 (running amb-iguos) by USB")
         self.o = mido.open_output(outs[0])
         self.i = mido.open_input(ins[0])
         for _ in range(3):                          # the first frame after opening the port can be lost
@@ -160,4 +160,4 @@ if __name__ == "__main__":
     try:
         main()
     except TimeoutError as e:
-        sys.exit(f"{e}: is Mini-Grain running, and no other app using its MIDI port?")
+        sys.exit(f"{e}: is amb-iguos running, and no other app using its MIDI port?")

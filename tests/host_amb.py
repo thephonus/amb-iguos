@@ -12,7 +12,7 @@ bad = 0
 
 def amb(part, note, sec, *kv):
     names = {'Wave': 'Onda', 'Attack': 'Ataque', 'Harmonic': 'Armónico', 'Transpose': 'Transp.', 'Detune': 'Desafinar',
-             'Pitch': 'Afinación', 'Structure': 'Estructura', 'Mod depth': 'Mod. cant.', 'Mod rate': 'Mod. vel.'}
+             'Pitch': 'Afinación', 'Structure': 'Estructura', 'Mod depth': 'Mod. cant.', 'Mod rate': 'Mod. vel.', 'Voice mode': 'Modo voz'}
     args = [f'{names.get(k, k)}={v}'.encode('latin-1') for k, v in kv]          # the firmware's names are Latin-1
     out = subprocess.run([b'build/host_ambdump', str(part).encode(), str(note).encode(), str(sec).encode(), *args], capture_output=True).stdout
     return np.frombuffer(out, dtype=np.int16).astype(float)
@@ -35,7 +35,7 @@ def f0(x, lo=40, hi=800):
 rms = []
 for w in range(32):
     for h in (0, 32768, 65535):
-        x = amb(3, 48, 3, ('Wave', round(w * 65535 / 31)), ('Attack', 0), ('Harmonic', h))
+        x = amb(2, 48, 3, ('Wave', round(w * 65535 / 31)), ('Attack', 0), ('Harmonic', h))
         r = x[-SR:].std()
         rms.append(r)
         if r < 100 or abs(x).max() > 32000:
@@ -43,7 +43,7 @@ for w in range(32):
 check(min(rms) > 0 and max(rms) / min(rms) < 3.5, f'32 waves x 3 positions: rms {min(rms):.0f} .. {max(rms):.0f} (ratio {max(rms) / min(rms):.1f})')
 
 # pitch: note 69 with the part's octave shift removed plays 440 Hz (wave 3, a sine-ish)
-for part, name in ((2, 'drone'), (3, 'pad')):
+for part, name in ((2, 'drone'),):
     x = amb(part, 69, 4, ('Transpose', 32768), ('Wave', 2 * 65535 // 31), ('Harmonic', 0), ('Detune', 32768), ('Pitch', 32768), ('Attack', 0))
     f = f0(x, 200, 900)
     check(abs(1200 * np.log2(f / 440)) < 30, f'{name}: note 69 at {f:.1f} Hz')
@@ -54,8 +54,8 @@ r = [x[i:i + SR // 2].std() for i in range(0, SR * 4, SR // 2)]
 check(r[0] < r[1] < r[2] and r[0] < 0.6 * r[2], 'attack: ' + ' '.join(f'{v:.0f}' for v in r))
 
 # unison is wider and no louder than a chord; mono keeps one voice
-poly = amb(3, 60, 4, ('Voice mode', 0))[-SR:].std()
-uni = amb(3, 60, 4, ('Voice mode', 65535))[-SR:].std()
+poly = amb(2, 60, 4, ('Modo voz', 0))[-SR:].std()
+uni = amb(2, 60, 4, ('Modo voz', 65535))[-SR:].std()
 check(0.5 < uni / poly < 2.2, f'unison {uni:.0f} against poly {poly:.0f}')
 
 # the structures differ: Drone 2 (MOD moves the harmonic) is not Drone 1 (MOD moves the detune)
@@ -64,7 +64,7 @@ d2 = amb(2, 60, 5, ('Structure', 65535), ('Mod depth', 65535), ('Mod rate', 4000
 check(abs(d1[-SR:].std() - d2[-SR:].std()) > 20 or not np.allclose(d1[-1000:], d2[-1000:]), 'Drone 1 and Drone 2 sound different')
 
 # the MOD LFO shapes: the harmonic mod makes the level wander (a slow, deep one on a wave whose level depends on it)
-x = amb(3, 48, 8, ('Wave', 22 * 65535 // 31), ('Mod depth', 65535), ('Mod rate', 30000), ('Attack', 0))
+x = amb(2, 48, 8, ('Wave', 22 * 65535 // 31), ('Mod depth', 65535), ('Mod rate', 30000), ('Attack', 0))
 w = [x[i:i + 4410].std() for i in range(SR, len(x) - 4410, 4410)]
 check(max(w) / max(min(w), 1) > 1.15, f'the MOD moves the sound: level swings by {max(w) / max(min(w), 1):.2f}')
 sys.exit(1 if bad else 0)

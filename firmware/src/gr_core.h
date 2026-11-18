@@ -7,7 +7,7 @@
 #include <stdint.h>
 
 /* ------------------------------------------------------------ sizes --- */
-#define NPART 4                  /* independent sounds, one per MIDI channel: two granular parts, a drone and a pad */
+#define NPART 3                  /* amb-iguos: layers A and B (granular) and the drone, one per MIDI channel */
 #define NGPART 2                 /* parts 1 and 2 are granular; part 3 is the drone, part 4 the pad */
 enum { KIND_GRAIN, KIND_DRONE, KIND_PAD };
 #define AMB_V 4u                 /* notes the drone or the pad sounds at once */

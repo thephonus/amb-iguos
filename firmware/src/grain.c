@@ -1,5 +1,5 @@
 /* SPDX-License-Identifier: GPL-3.0-only
- * Mini-Grain: a granular synthesizer for the M-Vave FM-1 (JieLi AC79 / WL82).
+ * amb-iguos: an ambient granular synthesizer for the M-Vave FM-1 (JieLi AC79 / WL82), built on Mini-Grain.
  * One compilation unit (the HAL is header-only). Each file uses what the files above it define, so the order
  * matters. The granular engine, parameters and screens follow the Granular Synth for ESP32-S3; the platform
  * (HAL, USB-MIDI / USB audio, TRS MIDI, flash storage, the M-UPGRADE entry) is Felucca / Mini-Tone by Leo Kuroshita
@@ -32,10 +32,10 @@
 #define FELUCCA_UART 1           /* TRS MIDI IN on UART1 / PH8 */
 #endif
 #ifndef FELUCCA_ID
-#define FELUCCA_ID "FM-1_900"    /* package identity (build.py: the .fwsc marker string) */
+#define FELUCCA_ID "FM-1_946"    /* package identity (build.py: the .fwsc marker string) */
 #endif
 #ifndef FELUCCA_VERSION
-#define FELUCCA_VERSION "Mini-Grain 0.1"
+#define FELUCCA_VERSION "amb-iguos 0.1"
 #endif
 #if FELUCCA_OTA && !FELUCCA_FLASH
 #error "FELUCCA_OTA needs FELUCCA_FLASH"

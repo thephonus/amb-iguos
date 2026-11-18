@@ -91,8 +91,8 @@ static void fm1_fault(const fm1_crash_t *c)
 static void draw_splash(void)
 {
     lcd_fill(0, 0, 240, 240, UC_BG);
-    draw_text_line(0, 84, 240, &AF_L, "Mini-Grain", UC_SAND, UC_BG, 1);
-    draw_text_line(0, 130, 240, &AF_S, "granular synthesizer", UC_MUTED, UC_BG, 1);
+    draw_text_line(0, 84, 240, &AF_L, "amb-iguos", UC_SAND, UC_BG, 1);
+    draw_text_line(0, 130, 240, &AF_S, "ambient granular", UC_MUTED, UC_BG, 1);
     draw_text_line(0, 150, 240, &AF_S, FELUCCA_VERSION, UC_UNLIT, UC_BG, 1);
 }
 
@@ -142,7 +142,7 @@ static void fm1_main(void)
     fm1_guard_lock_top();
     fm1_irq_enable_all();
     fm1_delay_ms(30);
-    splash_status("making the first sounds...");
+    splash_status("preparando los sonidos\205");
     state_boot();                             /* the last session's state, the sounds */
     amb_poll();                               /* the drone's and the pad's waves */
     for (ms = 0; ms < 300u; ms += 10u) {      /* the splash; the pot followed (MIDI IN plays under it) */
@@ -171,7 +171,7 @@ static void fm1_main(void)
                 if (ui.uboot) {
                     ui.uboot = 0;
                     ui.force = 1;
-                    ui_notice("Update cancelled");
+                    ui_notice("Actualizaci\363n cancelada");
                 }
                 t0 = fm1_ms;
             } else if (fm1_ms - t0 > 2000u && fm1_ms - t0 <= 5000u) {
@@ -179,8 +179,8 @@ static void fm1_main(void)
                 if (left != ui.uboot) {
                     char t[24];
                     ui.uboot = (uint8_t)left;
-                    str_cpy(t, "Update mode in ", sizeof t);
-                    fmt_int(t + 15, (int32_t)left);
+                    str_cpy(t, "Actualizar en ", sizeof t);
+                    fmt_int(t + 14, (int32_t)left);
                     ui_notice(t);
                 }
             } else if (fm1_ms - t0 > 5000u) {
@@ -201,7 +201,7 @@ static void fm1_main(void)
             usb.ota_req = 0;
             for (part = 0; part < NPART; part++)
                 gr_cmd(CMD_ALL_OFF, part, 0, 0);
-            ui_notice("Updating...");
+            ui_notice("Actualizando\205");
             ui_draw();
             if (flash_ok)
                 ota_session();                          /* returns only if nothing was committed */

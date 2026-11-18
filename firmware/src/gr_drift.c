@@ -22,6 +22,10 @@ static int32_t dr_deg;                       /* the walk, in degrees of the scal
 static uint8_t dr_drone[2], dr_drone_n;      /* what the drone holds */
 static struct { uint32_t ph; int32_t from, to; } dr_w[NPART][DR_NWAND];
 static int32_t dr_off[NPART][DR_NWAND];      /* Q16 norm offsets, read by gr_modulate */
+/* what the screen draws: the last notes the Deriva played (a ring), and a clock in blocks */
+#define DR_HIST 32u
+static volatile struct { uint32_t t, len; uint8_t note, part; } dr_hist[DR_HIST];
+static volatile uint32_t dr_hist_n, dr_clock;
 /* what each wanderer moves: the granular layers, then the drone */
 static const uint8_t DR_WP[DR_NWAND] = {P_POSITION, P_SIZE, P_DENSITY, P_CUTOFF};
 static const uint8_t DR_WPA[DR_NWAND] = {P_AHARM, P_ABAL, P_CUTOFF, P_ADETUNE};
@@ -92,6 +96,14 @@ static void dr_play(uint32_t part, int32_t note, uint32_t vel, uint32_t blocks)
     dr_n[k].part = (uint8_t)part;
     dr_n[k].note = (uint8_t)note;
     dr_n[k].left = blocks ? blocks : 1u;
+    {
+        uint32_t h = dr_hist_n % DR_HIST;
+        dr_hist[h].t = dr_clock;
+        dr_hist[h].len = blocks;
+        dr_hist[h].note = (uint8_t)note;
+        dr_hist[h].part = (uint8_t)part;
+        dr_hist_n++;
+    }
     gr_note_on(part, (uint32_t)note, vel);
 }
 
@@ -207,6 +219,7 @@ static uint8_t dr_was_on;
 static void dr_block(void)
 {
     uint32_t i;
+    dr_clock++;
     dr_wander();
     if (!dr_on) {
         if (dr_was_on) {

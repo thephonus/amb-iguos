@@ -1,5 +1,9 @@
 # Licensing
 
+amb-iguos is a modified version of Mini-Grain (eldontyrellcorp/Mini-Grain, 1.0.0), under the same licence. The
+scale, the Deriva, the Freeze, the shimmer, the macros, the cinema generators and the new screens are amb-iguos's.
+The battery thresholds follow the stock firmware as fm1-x0x (charlesvestal, GPL-3.0) reads them.
+
 Mini-Grain is free software, licensed under the GNU General Public License, version 3 only
 (`GPL-3.0-only`, full text in `LICENSE`).
 

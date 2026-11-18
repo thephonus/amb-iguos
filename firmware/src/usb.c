@@ -334,9 +334,9 @@ static const uint8_t STR1[] = {42, 3, 'H', 0, 0xFC, 0, 'g', 0, 'e', 0, 'l', 0, '
                                'n', 0, 's', 0, 't', 0, 'r', 0, 'u', 0, 'm', 0, 'e', 0, 'n', 0, 't', 0, 's', 0};
 static const uint8_t STR2[] = {30, 3, 'F', 0, 'e', 0, 'l', 0, 'u', 0, 'c', 0, 'c', 0, 'a', 0, ' ', 0, 'U', 0, 'p', 0,
                                'd', 0, 'a', 0, 't', 0, 'e', 0};
-#else   /* Mini-Grain: the names the computer shows for the MIDI and audio ports */
-static const uint8_t STR1[] = {22, 3, 'M', 0, 'i', 0, 'n', 0, 'i', 0, '-', 0, 'G', 0, 'r', 0, 'a', 0, 'i', 0, 'n', 0};
-static const uint8_t STR2[] = {22, 3, 'M', 0, 'i', 0, 'n', 0, 'i', 0, '-', 0, 'G', 0, 'r', 0, 'a', 0, 'i', 0, 'n', 0};
+#else   /* amb-iguos: the names the computer shows for the MIDI and audio ports */
+static const uint8_t STR1[] = {20, 3, 'a', 0, 'm', 0, 'b', 0, '-', 0, 'i', 0, 'g', 0, 'u', 0, 'o', 0, 's', 0};
+static const uint8_t STR2[] = {20, 3, 'a', 0, 'm', 0, 'b', 0, '-', 0, 'i', 0, 'g', 0, 'u', 0, 'o', 0, 's', 0};
 #endif
 
 static int get_desc(uint32_t wvalue, const uint8_t **d, uint16_t *l)
