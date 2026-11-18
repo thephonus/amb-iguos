@@ -51,6 +51,6 @@ def main(pkg, version, out):
 
 
 if __name__ == "__main__":
-    if len(sys.argv) != 4 or not re.match(r"^[\w .:+-]+$", sys.argv[2]):
+    if len(sys.argv) != 4 or not re.match(r"^[\w .:+()-]+$", sys.argv[2]):
         sys.exit(__doc__)
     main(*sys.argv[1:4])
