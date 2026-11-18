@@ -1,0 +1,508 @@
+<!doctype html>
+<!-- SPDX-License-Identifier: GPL-3.0-only -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>amb-iguos · muestras</title>
+<style>
+  :root {
+    --bg: #1b1726; --panel: #2b2540; --raise: #352e4f; --unlit: #4a4263; --text: #f4eee3; --muted: #a79fb8;
+    --sand: #f2c879; --aqua: #6fdad3; --coral: #ff8a70; --warn: #ff6f7f; --ink: #1b1726;
+    --radius: 14px;
+  }
+  @media (prefers-color-scheme: light) {
+    :root:not([data-theme="dark"]) {
+      --bg: #f6f1e8; --panel: #ffffff; --raise: #efe8f7; --unlit: #cfc6dc; --text: #231d33; --muted: #6a6180;
+      --sand: #b9791a; --aqua: #0f8f89; --coral: #c9482b; --warn: #c8324a; --ink: #ffffff;
+    }
+  }
+  * { box-sizing: border-box; }
+  html { color-scheme: dark light; }
+  body { margin: 0; background: var(--bg); color: var(--text); font: 15px/1.45 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  main { max-width: 860px; margin: 0 auto; padding: 24px 16px 64px; }
+  h1 { font-size: 1.5rem; margin: 0 0 4px; letter-spacing: .01em; }
+  h2 { font-size: 1rem; margin: 0 0 12px; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: .08em; }
+  p { margin: 0 0 8px; }
+  .sub { color: var(--muted); margin-bottom: 20px; }
+  .card { background: var(--panel); border-radius: var(--radius); padding: 18px; margin-bottom: 16px; }
+  .row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+  .grow { flex: 1 1 auto; }
+  button, select, input[type=text] {
+    font: inherit; color: var(--text); background: var(--raise); border: 1px solid transparent; border-radius: 10px;
+    padding: 8px 12px; min-height: 38px;
+  }
+  button { cursor: pointer; }
+  button:hover:not(:disabled) { border-color: var(--unlit); }
+  button:focus-visible, select:focus-visible, input:focus-visible, .drop:focus-visible { outline: 2px solid var(--sand); outline-offset: 2px; }
+  button:disabled { opacity: .45; cursor: not-allowed; }
+  button.primary { background: var(--sand); color: var(--ink); font-weight: 600; }
+  button.small { min-height: 30px; padding: 4px 10px; font-size: .88rem; }
+  button.danger:hover:not(:disabled) { border-color: var(--warn); color: var(--warn); }
+  .chip { display: inline-flex; align-items: center; gap: 8px; padding: 6px 12px; border-radius: 999px; background: var(--raise); font-size: .9rem; }
+  .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--unlit); }
+  .chip.on .dot { background: var(--aqua); box-shadow: 0 0 8px var(--aqua); }
+  .chip.err .dot { background: var(--warn); }
+  table { width: 100%; border-collapse: collapse; }
+  th { text-align: left; font-weight: 500; color: var(--muted); font-size: .82rem; padding: 0 8px 6px; }
+  td { padding: 8px; border-top: 1px solid var(--raise); vertical-align: middle; }
+  td.num { width: 36px; color: var(--muted); font-variant-numeric: tabular-nums; }
+  td.act { text-align: right; white-space: nowrap; }
+  tr.empty td.name { color: var(--unlit); }
+  tr.target td { background: color-mix(in srgb, var(--sand) 14%, transparent); }
+  tr.over td { background: color-mix(in srgb, var(--aqua) 22%, transparent); }
+  .drop { border: 2px dashed var(--unlit); border-radius: var(--radius); padding: 28px 16px; text-align: center; color: var(--muted); cursor: pointer; transition: border-color .15s, background .15s; }
+  .drop.over, .drop:hover { border-color: var(--sand); background: color-mix(in srgb, var(--sand) 8%, transparent); color: var(--text); }
+  .drop strong { color: var(--text); }
+  canvas { width: 100%; height: 130px; display: block; background: var(--bg); border-radius: 10px; touch-action: none; cursor: ew-resize; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; margin-top: 14px; }
+  label { display: block; font-size: .82rem; color: var(--muted); margin-bottom: 4px; }
+  .grid select, .grid input[type=text] { width: 100%; }
+  .check { display: flex; align-items: center; gap: 8px; margin: 0; color: var(--text); font-size: .95rem; min-height: 38px; }
+  .check input { width: 18px; height: 18px; accent-color: var(--sand); }
+  .summary { margin-top: 14px; padding: 10px 12px; border-radius: 10px; background: var(--bg); color: var(--muted); font-variant-numeric: tabular-nums; }
+  .summary.bad { color: var(--warn); }
+  progress { width: 100%; height: 10px; accent-color: var(--sand); }
+  #log { margin: 0; padding: 0; list-style: none; max-height: 180px; overflow: auto; font-size: .88rem; color: var(--muted); }
+  #log li { padding: 2px 0; } #log li.err { color: var(--warn); } #log li.ok { color: var(--aqua); }
+  .notice { padding: 12px 14px; border-radius: 10px; background: color-mix(in srgb, var(--coral) 18%, var(--panel)); margin-bottom: 16px; }
+  .notice a { color: var(--sand); }
+  code { background: var(--raise); padding: 1px 6px; border-radius: 6px; font-size: .9em; }
+  [hidden] { display: none !important; }
+  @media (max-width: 560px) { td.act { white-space: normal; } td.act button { margin: 2px 0 2px 4px; } }
+</style>
+</head>
+<body>
+<main>
+  <h1>amb-iguos · muestras</h1>
+  <p class="sub">Drop a sound here and it goes to the FM-1 over USB. Nothing is uploaded to a server: the file is converted in your browser.</p>
+
+  <div id="unsupported" class="notice" hidden>
+    This browser cannot talk to a USB-MIDI device (Web MIDI). Use <strong>Chrome</strong>, <strong>Edge</strong> or <strong>Opera</strong>,
+    or <strong>Firefox</strong> (it asks permission first). Safari does not support it; the command line tool
+    <code>tools/grain_sample.py</code> does the same job.
+  </div>
+
+  <section class="card" aria-labelledby="h-dev">
+    <div class="row" style="margin-bottom:12px">
+      <h2 id="h-dev" class="grow" style="margin:0">The FM-1</h2>
+      <span id="chip" class="chip" role="status" aria-live="polite"><span class="dot"></span><span id="chipText">Not connected</span></span>
+      <button id="connect" class="primary">Connect</button>
+    </div>
+    <table>
+      <thead><tr><th>#</th><th>Name</th><th>Length</th><th class="act"></th></tr></thead>
+      <tbody id="slots"></tbody>
+    </table>
+    <p id="slotsHint" class="sub" style="margin:12px 0 0">Connect the FM-1 (it must be running amb-iguos), then press Connect. On the FM-1, the samples appear on FUENTE (EDIT): turn K1 past the generators.</p>
+  </section>
+
+  <section class="card" aria-labelledby="h-add">
+    <h2 id="h-add">Add a sound</h2>
+    <div id="drop" class="drop" tabindex="0" role="button" aria-label="Choose audio files or drop them here">
+      <strong>Drop audio files here</strong> or click to choose<br>
+      <span>WAV, MP3, AAC, FLAC, OGG: anything your browser plays. One file opens the editor; several are sent to free slots as they are.</span>
+    </div>
+    <input id="file" type="file" accept="audio/*,.wav,.mp3,.flac,.ogg,.m4a,.aif,.aiff" multiple hidden>
+
+    <div id="editor" hidden>
+      <div class="row" style="margin:16px 0 8px">
+        <strong id="fname" class="grow" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap"></strong>
+        <span id="srcinfo" style="color:var(--muted)"></span>
+      </div>
+      <canvas id="wave" aria-label="Waveform: drag the two edges to trim"></canvas>
+      <div class="row" style="justify-content:space-between;color:var(--muted);font-size:.85rem;margin-top:6px">
+        <span>Start <b id="tStart" style="color:var(--text)"></b></span>
+        <span>Drag the edges to trim. Double-click to reset.</span>
+        <span>End <b id="tEnd" style="color:var(--text)"></b></span>
+      </div>
+      <div class="grid">
+        <div><label for="slot">Slot</label><select id="slot"></select></div>
+        <div><label for="name">Name (15 letters)</label><input id="name" type="text" maxlength="15" autocomplete="off"></div>
+        <div><label for="rate">Quality</label>
+          <select id="rate">
+            <option value="0">Automatic (best that fits)</option>
+            <option value="44100">44.1 kHz (about 1 s)</option><option value="32000">32 kHz (1.4 s)</option>
+            <option value="22050">22.05 kHz (2 s)</option><option value="16000">16 kHz (2.8 s)</option>
+            <option value="11025">11.025 kHz (4 s)</option><option value="8000">8 kHz (5.6 s)</option>
+          </select></div>
+        <div><label>Options</label>
+          <label class="check"><input id="norm" type="checkbox" checked> Normalise</label>
+          <label class="check"><input id="fade" type="checkbox" checked> Soften the ends</label></div>
+      </div>
+      <div id="summary" class="summary" role="status" aria-live="polite"></div>
+      <div class="row" style="margin-top:14px">
+        <button id="preview">▶ Preview</button>
+        <span class="grow"></span>
+        <button id="cancel">Cancel</button>
+        <button id="send" class="primary">Send to the FM-1</button>
+      </div>
+    </div>
+    <div id="progressBox" hidden style="margin-top:14px">
+      <div class="row" style="justify-content:space-between"><span id="progressText">Sending…</span><span id="progressPct"></span></div>
+      <progress id="progress" max="100" value="0"></progress>
+    </div>
+  </section>
+
+  <section class="card" aria-labelledby="h-log">
+    <h2 id="h-log">Activity</h2>
+    <ul id="log"></ul>
+  </section>
+</main>
+
+<script src="grainlink.js"></script>
+<script>
+'use strict';
+const G = GrainLink;
+const $ = (id) => document.getElementById(id);
+const PORT = /amb-iguos|mini-grain/i;
+
+// ---------------------------------------------------------------- log, status
+function log(msg, cls) {
+  const li = document.createElement('li');
+  li.textContent = new Date().toLocaleTimeString() + '  ' + msg;
+  if (cls) li.className = cls;
+  $('log').prepend(li);
+}
+function setChip(text, cls) { $('chipText').textContent = text; $('chip').className = 'chip ' + (cls || ''); }
+function progress(text, pct) {
+  $('progressBox').hidden = text === null;
+  if (text === null) return;
+  $('progressText').textContent = text;
+  $('progressPct').textContent = pct == null ? '' : Math.round(pct) + ' %';
+  if (pct == null) $('progress').removeAttribute('value'); else $('progress').value = pct;
+}
+
+// ---------------------------------------------------------------- the link
+const link = { access: null, input: null, output: null, info: null, list: [], busy: false, wait: null, buf: [] };
+
+function onMessage(ev) {
+  for (const b of ev.data) {                         // a SysEx may arrive in pieces
+    if (b === 0xF0) link.buf = [];
+    if (link.buf) link.buf.push(b);
+    if (b === 0xF7 && link.buf) {
+      const m = link.buf; link.buf = null;
+      if (m[1] === G.HDR[0] && m[2] === G.HDR[1] && m[3] === G.HDR[2] && link.wait && link.wait.cmd === m[4]) {
+        const w = link.wait; link.wait = null; clearTimeout(w.timer); w.resolve(m.slice(1, m.length - 1));
+      }
+    }
+  }
+}
+function request(frame, timeoutMs) {
+  return new Promise((resolve, reject) => {
+    if (!link.output) return reject(new Error('the FM-1 is not connected'));
+    const timer = setTimeout(() => { link.wait = null; reject(new Error('no answer from the FM-1 (is it running amb-iguos, and is no other program using its MIDI port?)')); }, timeoutMs || 5000);
+    link.wait = { cmd: frame[3], resolve, timer };
+    link.output.send([0xF0, ...frame, 0xF7]);
+  });
+}
+function check(reply, what) {
+  if (reply[4]) throw new Error(what + ': ' + (G.ERR[reply[4]] || 'error ' + reply[4]));
+  return reply;
+}
+
+function pickPorts() {
+  link.input = link.output = null;
+  for (const i of link.access.inputs.values()) if (PORT.test(i.name)) link.input = i;
+  for (const o of link.access.outputs.values()) if (PORT.test(o.name)) link.output = o;
+  if (link.input) link.input.onmidimessage = onMessage;
+  return !!(link.input && link.output);
+}
+
+async function refresh() {
+  const r = check(await request([...G.HDR, G.CMD.LIST]), 'list');
+  link.list = G.parseList(r);
+  renderSlots();
+}
+
+async function connect() {
+  if (!navigator.requestMIDIAccess) { $('unsupported').hidden = false; return; }
+  try {
+    if (!link.access) {
+      link.access = await navigator.requestMIDIAccess({ sysex: true });
+      link.access.onstatechange = () => { if (link.access) reconnect(false); };
+    }
+    await reconnect(true);
+  } catch (e) {
+    setChip('Not connected', 'err'); log('MIDI access refused: ' + e.message, 'err');
+  }
+}
+async function reconnect(verbose) {
+  if (!pickPorts()) {
+    link.info = null; link.list = []; renderSlots(); setChip('FM-1 not found', 'err');
+    $('slotsHint').hidden = false;
+    if (verbose) log('No "amb-iguos" MIDI port: connect the FM-1 by USB (it must run amb-iguos), then press Connect.', 'err');
+    return;
+  }
+  try {
+    for (let k = 0; k < 3; k++) {                    // the first frame after opening a port can be lost
+      try { link.info = G.parseInfo(check(await request([...G.HDR, G.CMD.INFO], 1500), 'info')); break; }
+      catch (e) { if (k === 2) throw e; }
+    }
+    await refresh();
+    setChip('Connected: ' + link.output.name, 'on'); $('slotsHint').hidden = true;
+    if (verbose) log('Connected to ' + link.output.name + ': ' + link.info.slots + ' slots.', 'ok');
+    fillSlotSelect();
+  } catch (e) {
+    setChip('No answer', 'err'); log(e.message, 'err');
+  }
+}
+
+// ---------------------------------------------------------------- the slot list
+function fmtSec(s) { return s.toFixed(s < 10 ? 2 : 1) + ' s'; }
+function khz(r) { return parseFloat((r / 1000).toFixed(3)) + ' kHz'; }
+function renderSlots() {
+  const tb = $('slots');
+  tb.textContent = '';
+  const n = link.info ? link.info.slots : 8;
+  for (let i = 0; i < n; i++) {
+    const s = link.list[i], tr = document.createElement('tr');
+    tr.dataset.slot = i;
+    tr.className = s && s.used ? '' : 'empty';
+    const td = (cls, text) => { const c = document.createElement('td'); c.className = cls; c.textContent = text; tr.appendChild(c); return c; };
+    td('num', i + 1);
+    td('name', s && s.used ? (s.name || '(no name)') : (link.info ? 'empty' : '–'));
+    td('len', s && s.used ? fmtSec(s.frames / s.rate) + ' · ' + khz(s.rate) : '');
+    const act = td('act', '');
+    if (s && s.used) {
+      for (const part of [1, 2]) {
+        const b = document.createElement('button');
+        b.className = 'small'; b.textContent = 'Part ' + part; b.title = 'Load into part ' + part + ' of the FM-1';
+        b.onclick = () => op('load', () => request([...G.HDR, G.CMD.LOAD, i, part - 1], 10000), 'Slot ' + (i + 1) + ' loaded into part ' + part);
+        act.appendChild(b);
+      }
+      const e = document.createElement('button');
+      e.className = 'small danger'; e.textContent = 'Erase';
+      e.onclick = () => { if (confirm('Erase slot ' + (i + 1) + ' (' + s.name + ')?')) op('erase', () => request([...G.HDR, G.CMD.ERASE, i], 10000), 'Slot ' + (i + 1) + ' erased', true); };
+      act.appendChild(e);
+    }
+    // a file dropped on a row goes to that slot
+    tr.addEventListener('dragover', (ev) => { if (link.info) { ev.preventDefault(); tr.classList.add('over'); } });
+    tr.addEventListener('dragleave', () => tr.classList.remove('over'));
+    tr.addEventListener('drop', (ev) => { ev.preventDefault(); ev.stopPropagation(); tr.classList.remove('over'); takeFiles(ev.dataTransfer.files, i); });
+    tb.appendChild(tr);
+  }
+}
+async function op(what, fn, okMsg, reload) {
+  if (link.busy) return;
+  link.busy = true;
+  try { check(await fn(), what); log(okMsg, 'ok'); if (reload !== false) await refresh(); }
+  catch (e) { log(e.message, 'err'); }
+  finally { link.busy = false; }
+}
+function fillSlotSelect(prefer) {
+  const sel = $('slot'), n = link.info ? link.info.slots : 8;
+  const keep = prefer != null ? prefer : sel.value;
+  sel.textContent = '';
+  for (let i = 0; i < n; i++) {
+    const o = document.createElement('option'), s = link.list[i];
+    o.value = i; o.textContent = (i + 1) + (s && s.used ? ' – ' + (s.name || 'in use') + ' (replace)' : ' – empty');
+    sel.appendChild(o);
+  }
+  const free = link.list.findIndex((s) => !s.used);
+  sel.value = keep !== '' && keep != null ? keep : (free >= 0 ? free : 0);
+}
+
+// ---------------------------------------------------------------- the editor
+const ed = { buf: null, file: null, srcRate: 44100, peaks: null, start: 0, end: 0, drag: null, playing: null };
+let actx = null;
+function audio() { return actx || (actx = new (window.AudioContext || window.webkitAudioContext)()); }
+
+// the browser decodes at its own rate: a WAV's real rate is read from its header, so a 22 kHz file is not blown up
+function sniffRate(raw) {
+  const v = new DataView(raw);
+  if (raw.byteLength > 28 && v.getUint32(0) === 0x52494646 && v.getUint32(8) === 0x57415645) return v.getUint32(24, true);
+  return 0;
+}
+async function decode(file) {
+  const raw = await file.arrayBuffer(), rate = sniffRate(raw), buf = await audio().decodeAudioData(raw);
+  return { buf, srcRate: rate || buf.sampleRate };
+}
+function computePeaks(buf, n) {
+  const mono = new Float32Array(buf.length);
+  for (let c = 0; c < buf.numberOfChannels; c++) { const d = buf.getChannelData(c); for (let i = 0; i < d.length; i++) mono[i] += d[i] / buf.numberOfChannels; }
+  const peaks = new Float32Array(n * 2), per = buf.length / n;
+  for (let x = 0; x < n; x++) {
+    let lo = 0, hi = 0;
+    for (let i = Math.floor(x * per), e = Math.min(buf.length, Math.floor((x + 1) * per)); i < e; i++) { const v = mono[i]; if (v < lo) lo = v; if (v > hi) hi = v; }
+    peaks[2 * x] = lo; peaks[2 * x + 1] = hi;
+  }
+  return peaks;
+}
+
+// the clip as it will be sent: trimmed, resampled to the chosen rate, mono, int16
+async function render(buf, start, end, rate, opts) {
+  const maxFrames = link.info ? link.info.maxFrames : 43008;
+  const frames = Math.max(64, Math.min(maxFrames, Math.floor((end - start) * rate)));
+  const off = new OfflineAudioContext(1, frames, rate);
+  const src = off.createBufferSource();
+  src.buffer = buf; src.connect(off.destination);
+  src.start(0, start, end - start);
+  const out = (await off.startRendering()).getChannelData(0).slice();
+  if (opts.fade) {                                   // a few milliseconds, so a loop of grains does not click
+    const f = Math.min(Math.floor(rate * 0.004), out.length >> 2);
+    for (let i = 0; i < f; i++) { const g = i / f; out[i] *= g; out[out.length - 1 - i] *= g; }
+  }
+  if (opts.norm) return G.toInt16(out, 31130);       // peak at 95 %
+  const raw = new Int16Array(out.length);
+  for (let i = 0; i < out.length; i++) raw[i] = Math.max(-32768, Math.min(32767, Math.round(out[i] * 32767)));
+  return raw;
+}
+function plan() {
+  const maxFrames = link.info ? link.info.maxFrames : 43008, maxBytes = link.info ? link.info.maxBytes : 24320;
+  const seconds = Math.max(0, ed.end - ed.start), wanted = Number($('rate').value);
+  const fit = G.fitRate(seconds, ed.srcRate, maxFrames, wanted);
+  return { seconds, ...fit, maxFrames, maxBytes, bytes: Math.ceil(fit.frames / 2) };
+}
+function updateSummary() {
+  if (!ed.buf) return;
+  const p = plan(), el = $('summary');
+  $('tStart').textContent = fmtSec(ed.start); $('tEnd').textContent = fmtSec(ed.end);
+  let text = fmtSec(p.seconds) + ' → ' + khz(p.rate) + ', ' + p.frames.toLocaleString() + ' samples, '
+    + (p.bytes / 1024).toFixed(1) + ' KB of ' + (p.maxBytes / 1024).toFixed(1) + ' KB';
+  let bad = false;
+  if (p.cut) { text += '. Too long for this quality: it will be cut after ' + fmtSec(p.frames / p.rate) + '. Trim it, or lower the quality.'; }
+  if (p.seconds < 0.02) { text = 'The selection is too short.'; bad = true; }
+  el.textContent = text; el.className = 'summary' + (bad ? ' bad' : '');
+  $('send').disabled = bad || !link.info;
+  $('preview').disabled = bad;
+}
+function drawWave() {
+  const cv = $('wave'), dpr = window.devicePixelRatio || 1, w = cv.clientWidth, h = cv.clientHeight;
+  if (!w) return;
+  cv.width = Math.round(w * dpr); cv.height = Math.round(h * dpr);
+  const c = cv.getContext('2d'), css = getComputedStyle(document.documentElement);
+  c.scale(dpr, dpr);
+  const unlit = css.getPropertyValue('--unlit').trim(), sand = css.getPropertyValue('--sand').trim(), text = css.getPropertyValue('--text').trim();
+  const dur = ed.buf.duration, x0 = ed.start / dur * w, x1 = ed.end / dur * w, mid = h / 2;
+  const cols = Math.max(2, Math.floor(w));
+  if (!ed.peaks || ed.peaks.length !== cols * 2) ed.peaks = computePeaks(ed.buf, cols);
+  const peaks = ed.peaks;
+  for (let x = 0; x < peaks.length / 2; x++) {
+    c.fillStyle = x >= x0 && x <= x1 ? sand : unlit;
+    const lo = peaks[2 * x] * mid * 0.95, hi = peaks[2 * x + 1] * mid * 0.95;
+    c.fillRect(x, mid - hi, 1, Math.max(1, hi - lo));
+  }
+  c.fillStyle = text;
+  for (const x of [x0, x1]) c.fillRect(Math.round(x) - 1, 0, 2, h);
+  c.globalAlpha = 0.55; c.fillStyle = css.getPropertyValue('--bg').trim();
+  c.fillRect(0, 0, x0, h); c.fillRect(x1, 0, w - x1, h); c.globalAlpha = 1;
+}
+function openEditor(dec, file, slot) {
+  stopPreview();
+  const buf = dec.buf;
+  ed.buf = buf; ed.file = file; ed.srcRate = dec.srcRate; ed.peaks = null; ed.start = 0; ed.end = buf.duration;
+  $('fname').textContent = file.name;
+  $('srcinfo').textContent = fmtSec(buf.duration) + ' · ' + khz(ed.srcRate) + ' · ' + (buf.numberOfChannels === 1 ? 'mono' : buf.numberOfChannels + ' channels');
+  $('name').value = file.name.replace(/\.[^.]+$/, '').replace(/[^\x20-\x7E]/g, '').slice(0, 15);
+  fillSlotSelect(slot != null ? String(slot) : '');
+  $('editor').hidden = false; $('drop').hidden = true;
+  requestAnimationFrame(() => { drawWave(); updateSummary(); });
+}
+function closeEditor() { stopPreview(); ed.buf = null; $('editor').hidden = true; $('drop').hidden = false; }
+
+// trimming with the pointer
+function waveX(ev) { const r = $('wave').getBoundingClientRect(); return Math.max(0, Math.min(1, (ev.clientX - r.left) / r.width)) * ed.buf.duration; }
+function dragTo(ev) {
+  const t = waveX(ev), min = 0.02;
+  if (ed.drag === 'start') ed.start = Math.min(t, ed.end - min); else ed.end = Math.max(t, ed.start + min);
+  drawWave(); updateSummary();
+}
+$('wave').addEventListener('pointerdown', (ev) => {
+  if (!ed.buf) return;
+  const t = waveX(ev);
+  ed.drag = Math.abs(t - ed.start) < Math.abs(t - ed.end) ? 'start' : 'end';
+  $('wave').setPointerCapture(ev.pointerId);
+  dragTo(ev);
+});
+$('wave').addEventListener('pointermove', (ev) => { if (ed.drag) dragTo(ev); });
+$('wave').addEventListener('pointerup', () => { ed.drag = null; stopPreview(); });
+$('wave').addEventListener('dblclick', () => { ed.start = 0; ed.end = ed.buf.duration; drawWave(); updateSummary(); });
+window.addEventListener('resize', () => { if (ed.buf) { ed.peaks = null; drawWave(); } });
+$('rate').addEventListener('change', updateSummary);
+
+// preview: what the FM-1 will play, after the conversion and the ADPCM
+function stopPreview() { if (ed.playing) { try { ed.playing.stop(); } catch (e) { /* already ended */ } ed.playing = null; } $('preview').textContent = '▶ Preview'; }
+async function prepared() {
+  const p = plan(), samples = await render(ed.buf, ed.start, ed.end, p.rate, { norm: $('norm').checked, fade: $('fade').checked });
+  return { samples, rate: p.rate };
+}
+$('preview').onclick = async () => {
+  if (ed.playing) return stopPreview();
+  const { samples, rate } = await prepared();
+  const dec = G.imaDecode(G.imaEncode(samples), samples.length), ctx = audio();
+  const ab = ctx.createBuffer(1, dec.length, rate), ch = ab.getChannelData(0);
+  for (let i = 0; i < dec.length; i++) ch[i] = dec[i] / 32768;
+  const src = ctx.createBufferSource();
+  src.buffer = ab; src.connect(ctx.destination);
+  src.onended = () => { if (ed.playing === src) stopPreview(); };
+  ed.playing = src; src.start(); $('preview').textContent = '■ Stop';
+};
+
+// ---------------------------------------------------------------- sending
+async function upload(slot, samples, rate, name) {
+  const { frames } = G.buildFrames(slot, samples, rate, name);
+  check(await request(frames[0], 15000), 'begin');
+  for (let i = 1; i < frames.length - 1; i++) {
+    check(await request(frames[i], 5000), 'write');
+    progress('Sending to slot ' + (slot + 1) + '…', 100 * i / (frames.length - 1));
+  }
+  check(await request(frames[frames.length - 1], 15000), 'end');
+}
+$('send').onclick = async () => {
+  if (link.busy || !ed.buf) return;
+  link.busy = true; $('send').disabled = true; stopPreview();
+  const slot = Number($('slot').value), name = $('name').value.trim() || 'sample';
+  try {
+    progress('Converting…', null);
+    const { samples, rate } = await prepared();
+    await upload(slot, samples, rate, name);
+    log('"' + name + '" is in slot ' + (slot + 1) + ' (' + fmtSec(samples.length / rate) + ').', 'ok');
+    progress(null);
+    await refresh();
+    closeEditor();
+  } catch (e) { progress(null); log(e.message, 'err'); $('send').disabled = false; }
+  finally { link.busy = false; }
+};
+$('cancel').onclick = closeEditor;
+
+// ---------------------------------------------------------------- files
+async function takeFiles(list, slot) {
+  const files = Array.from(list).filter((f) => f.type.startsWith('audio/') || /\.(wav|mp3|flac|ogg|m4a|aac|aif|aiff)$/i.test(f.name));
+  if (!files.length) { log('No audio file in what was dropped.', 'err'); return; }
+  if (!link.info) { log('Connect the FM-1 first.', 'err'); return; }
+  if (link.busy) return;
+  try {
+    if (files.length === 1) { openEditor(await decode(files[0]), files[0], slot); return; }
+    link.busy = true;
+    for (const f of files) {                         // several files: default settings, the next free slots
+      const free = link.list.findIndex((s) => !s.used);
+      if (free < 0) { log('No free slot left for ' + f.name + '.', 'err'); break; }
+      try {
+        progress('Converting ' + f.name + '…', null);
+        const dec = await decode(f), buf = dec.buf, p = G.fitRate(buf.duration, dec.srcRate, link.info.maxFrames, 0);
+        const samples = await render(buf, 0, Math.min(buf.duration, p.frames / p.rate), p.rate, { norm: true, fade: true });
+        const name = f.name.replace(/\.[^.]+$/, '').replace(/[^\x20-\x7E]/g, '').slice(0, 15) || 'sample';
+        await upload(free, samples, p.rate, name);
+        log('"' + name + '" is in slot ' + (free + 1) + (p.cut ? ' (cut to fit)' : '') + '.', 'ok');
+        await refresh();
+      } catch (e) { log(f.name + ': ' + e.message, 'err'); }
+    }
+    progress(null);
+  } catch (e) { log(e.message, 'err'); }
+  finally { link.busy = false; }
+}
+const drop = $('drop');
+drop.onclick = () => $('file').click();
+drop.onkeydown = (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); $('file').click(); } };
+$('file').onchange = (e) => { takeFiles(e.target.files); e.target.value = ''; };
+for (const el of [drop, document.body]) {
+  el.addEventListener('dragover', (e) => { e.preventDefault(); drop.classList.add('over'); });
+  el.addEventListener('dragleave', () => drop.classList.remove('over'));
+  el.addEventListener('drop', (e) => { e.preventDefault(); drop.classList.remove('over'); if (e.target.closest && !e.target.closest('tr[data-slot]')) takeFiles(e.dataTransfer.files); });
+}
+$('connect').onclick = connect;
+if (!navigator.requestMIDIAccess) { $('unsupported').hidden = false; $('connect').disabled = true; setChip('No Web MIDI', 'err'); }
+renderSlots();
+</script>
+</body>
+</html>
