@@ -57,10 +57,13 @@
 
   <details>
     <summary>Volver al firmware oficial (V15 / V16)</summary>
-    <p class="small" style="margin-top:12px">Descarga el firmware oficial de
-      <a href="https://www.m-vave.com/product?id=fm-1" target="_blank" rel="noopener">M-VAVE</a>, descomprímelo y elige el
-      archivo <b>FM-1.fwsc</b> sin modificar. Se comprueba aquí, en tu navegador; no se envía a ningún sitio. Tus presets de
-      amb-iguos no se guardan al volver al oficial.</p>
+    <p class="small" style="margin-top:12px">Elige el archivo <b>FM-1.fwsc</b> oficial sin modificar. Se comprueba aquí, en tu
+      navegador; no se envía a ningún sitio. Tus presets de amb-iguos no se guardan al volver al oficial.</p>
+    <p class="small"><b>Usa la V15.</b> Desde amb-iguos, Mini-Grain y otros firmwares hechos sobre Felucca, la FM-1 solo acepta
+      volver a la <b>V15</b>: la V16 cambia el principio de la memoria y el firmware que está corriendo la rechaza antes de
+      escribir nada. M-VAVE ya solo ofrece la V16, pero hay una copia de la V15 en
+      <a href="https://quixotic7.github.io/MvaveFM1Unbricker/" target="_blank" rel="noopener">FM1 Unbricker</a>
+      («Download V15-FM-1.fwsc»). Ya en la V15 oficial, puedes pasar a la V16 con el actualizador de M-VAVE (M-UPGRADE).</p>
     <p><input id="stock-file" type="file" accept=".fwsc"></p>
     <p><button id="stock-go" class="alt" disabled>Instalar el firmware oficial</button></p>
   </details>
@@ -164,7 +167,10 @@ $("stock-file").addEventListener("change", async () => {
   try {
     if (!STOCK_SIZES.includes(file.size)) throw new Error("no es el FM-1.fwsc oficial V15 o V16 sin modificar");
     stock = await validateStockPackage(new Uint8Array(await file.arrayBuffer()));
-    say("Firmware oficial comprobado: " + stock.version, "ok");
+    if (stock.version === "V16")
+      say("Es la V16 oficial. Ojo: desde amb-iguos o Mini-Grain la FM-1 la rechaza; usa la V15 (enlace arriba).", "err");
+    else
+      say("Firmware oficial comprobado: " + stock.version, "ok");
   } catch (e) { say("No puedo usar ese archivo: " + e.message, "err"); }
   lock(false);
 });
@@ -177,6 +183,9 @@ $("stock-go").addEventListener("click", async () => {
     if (await run(stock.image, stock.product)) say("Listo: firmware oficial " + stock.version + " instalado", "ok");
     else say(TEXT.stopped, "err");
   } catch (e) {
+    if (e && e.code === "stopped" && stock.version === "V16")
+      say("La FM-1 ha rechazado la V16 sin escribir nada (es normal desde firmwares hechos sobre Felucca). Usa la V15: mira el enlace de arriba.", "err");
+    else
     say(e && e.code && TEXT[e.code] ? TEXT[e.code] + (e.detail || "") : "Error: " + (e && e.message), "err");
     log(String(e && e.stack || e));
   }

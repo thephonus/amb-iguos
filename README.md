@@ -51,7 +51,7 @@ Un punto blanco dentro de un dial indica dónde lo ha llevado ahora mismo un LFO
 
 **Lo más fácil: el instalador web** → **https://thephonus.github.io/amb-iguos/**
 
-Ábrelo en Chrome o Edge, conecta la FM-1 por USB y pulsa **Instalar**. Instala siempre la última versión compilada. Desde esa misma página puedes volver al firmware oficial (V15 / V16): solo tienes que elegir el `FM-1.fwsc` de M-VAVE.
+Ábrelo en Chrome o Edge, conecta la FM-1 por USB y pulsa **Instalar**. Instala siempre la última versión compilada. Desde esa misma página puedes volver al firmware oficial con el `FM-1.fwsc` de la **V15**. Desde amb-iguos (y desde otros firmwares hechos sobre Felucca) la FM-1 rechaza la V16 sin escribir nada. M-VAVE ya solo ofrece la V16, pero [FM1 Unbricker](https://quixotic7.github.io/MvaveFM1Unbricker/) guarda una copia de la V15. Ya en la V15 oficial, puedes subir a la V16 con M-UPGRADE.
 
 Si tienes otro firmware no oficial (JIANT, SLOOP, Felucca…), vuelve antes al oficial. Desde el oficial, desde Mini-Grain o desde otra versión de amb-iguos puedes instalar directamente.
 
