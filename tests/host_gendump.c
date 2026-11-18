@@ -32,6 +32,7 @@ static void fmt_fix(char *b, int32_t v, int decimals)
 #include "gr_engine.c"
 #include "gr_gen.c"
 #include "gr_amb.c"
+#include "gr_drift.c"
 
 
 static int16_t smp_mem[NPART][SMP_FRAMES + 1];

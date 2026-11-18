@@ -21,6 +21,7 @@ static void fmt_fix(char *b, int32_t v, int decimals) { (void)b; (void)v; (void)
 #include "gr_engine.c"
 #include "gr_gen.c"
 #include "gr_amb.c"
+#include "gr_drift.c"
 
 
 static void midi_out_event(uint32_t pkt) { (void)pkt; }

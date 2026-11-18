@@ -115,10 +115,54 @@ static inline int32_t rv_modallpass(uint32_t l, int32_t x, int32_t g, uint32_t d
     return del + mulq15(g, v);
 }
 
-/* adds the wet signal; decay and damp x 1000 */
-static void gr_reverb_run(const int32_t *inL, const int32_t *inR, int32_t *outL, int32_t *outR, uint32_t n,
-                          int32_t decay1000, int32_t damp1000)
+/* ---------------------------------------------------------- shimmer --- */
+/* amb-iguos: the reverb's tank, pitched up an octave (or a fifth, an octave and a fifth, or down an octave) inside its
+ * own feedback, so each pass round the tank climbs: the loop gain stays the decay's, the tail cannot run away. A two-tap delay-line pitch shifter: two read heads half a window
+ * apart sweep through a 2048-sample line at (ratio - 1) samples a sample, each faded in and out by a triangle. */
+#define SH_N 2048u
+static int16_t sh_buf[SH_N] GR_POOL;
+static struct {
+    uint32_t w;
+    int32_t d;                       /* the first head's delay, Q16 samples (0 .. SH_N) */
+    int32_t out, lp;                 /* the last shifted sample, a gentle low-pass on the way in (Q15) */
+} sh;
+static const int32_t SH_RATE[4] = {65536, 32657, 130849, -32768};          /* +12, +7, +19, -12: (ratio - 1), Q16 */
+
+static inline int32_t sh_tap(int32_t d_q16)
 {
+    int32_t whole = d_q16 >> 16, fr = (d_q16 >> 1) & 0x7FFF;
+    uint32_t a = (sh.w - 1u - (uint32_t)whole) & (SH_N - 1u), b = (a - 1u) & (SH_N - 1u);
+    return sh_buf[a] + (((sh_buf[b] - sh_buf[a]) * fr) >> 15);
+}
+
+/* x: the reverb's wet mono sample; returns the shifted sample */
+static inline int32_t sh_step(int32_t x, uint32_t interval)
+{
+    const int32_t len = (int32_t)(SH_N - 4u) << 16, half = len / 2;
+    int32_t d2, w1, t1, t2;
+    sh.lp += (x - sh.lp) >> 1;                       /* a touch darker each time round */
+    sh_buf[sh.w] = (int16_t)sat16(sh.lp);
+    sh.w = (sh.w + 1u) & (SH_N - 1u);
+    sh.d -= SH_RATE[interval & 3u];
+    if (sh.d < 0)
+        sh.d += len;
+    else if (sh.d >= len)
+        sh.d -= len;
+    d2 = sh.d + half;
+    if (d2 >= len)
+        d2 -= len;
+    t1 = sh.d >> 15;                                /* 0 .. 2 x (SH_N - 4): the triangle of the first head */
+    w1 = t1 < (half >> 15) ? t1 * 32767 / (half >> 15) : (2 * (half >> 15) - t1) * 32767 / (half >> 15);
+    t2 = 32767 - w1;
+    sh.out = mulq15(sh_tap(sh.d), w1) + mulq15(sh_tap(d2), t2);
+    return sh.out;
+}
+
+/* adds the wet signal; decay and damp x 1000; shimmer x 1000 and its interval (0 .. 3) */
+static void gr_reverb_run(const int32_t *inL, const int32_t *inR, int32_t *outL, int32_t *outR, uint32_t n,
+                          int32_t decay1000, int32_t damp1000, int32_t shim1000, uint32_t interval)
+{
+    int32_t shg = (shim1000 * 26214) / 1000;                                   /* up to 0.8 of the feedback pitched */
     static const uint16_t TL[7] = {266, 2974, 1913, 1996, 1990, 187, 1066}, TR[7] = {353, 3627, 1228, 2673, 2111, 335, 121};
     int32_t decay = (decay1000 * 32768 + 500) / 1000, dampc = 32768 - (damp1000 * 32768 + 500) / 1000;
     int32_t dif2 = clampi(decay + 4915, 8192, 16384);                         /* min(.5, max(.25, decay + .15)) */
@@ -151,6 +195,11 @@ static void gr_reverb_run(const int32_t *inL, const int32_t *inR, int32_t *outL,
         b2 = rv_allpass(RV_APR, mulq15(rv.lpr, decay), dif2, 2656);
         b3 = rv_tap(RV_D3R, 3163);
         rv_push(RV_D3R, b2);
+        if (shg) {                                                              /* the shimmer, in the loop */
+            int32_t up = sh_step((a3 + b3) >> 1, interval);
+            a3 += mulq15(shg, up - a3);
+            b3 += mulq15(shg, up - b3);
+        }
         rv.fbl = a3;
         rv.fbr = b3;
         wl = rv_tap(RV_D2R, TL[0]) + rv_tap(RV_D2R, TL[1]) - rv_tap(RV_APR, TL[2]) + rv_tap(RV_D3R, TL[3]) -

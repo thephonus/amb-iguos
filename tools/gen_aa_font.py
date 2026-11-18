@@ -36,7 +36,8 @@ import aa_raster as ar  # noqa: E402
 
 FONTS = Path(__file__).resolve().parents[1] / "fonts"
 LOCAL_INTER = os.path.expanduser("~/Library/Fonts/Inter.ttc")   # 4.001: 0 Regular, 10 Medium, 12 SemiBold
-EXTRAS = [0xA9, 0xB0, 0xB7, 0xC4, 0xD6, 0xDC, 0xE4, 0xF6, 0xFC, 0x2026]  # (c) deg . A: O: U: a: o: u: (Latin-1), ...
+EXTRAS = [0xA1, 0xA9, 0xAA, 0xB0, 0xB7, 0xBA, 0xBF, 0xC1, 0xC4, 0xC9, 0xCD, 0xD1, 0xD3, 0xD6, 0xDA, 0xDC, 0xE1, 0xE4, 0xE9,
+          0xED, 0xF1, 0xF3, 0xF6, 0xFA, 0xFC, 0x2026]  # Spanish and German accents (Latin-1), ...  # (c) deg . A: O: U: a: o: u: (Latin-1), ...
 CODE = {0x2026: 0x85}                  # characters outside Latin-1 -> their one-byte code in the firmware
 PHASES, PHASES_L = 4, 2                # horizontal phases per glyph (aa_raster.raster_font): S M, L
 # faces stored Huffman-coded (--huff): M and L. S, the most drawn and the least compressible (-15 %), stays
@@ -47,7 +48,7 @@ HUFF = [("M", "L")]
 # graph_title: # . / J W too; a value with another character is set in M): a sparse face of those glyphs, the
 # space as its range and the rest as extras
 # (ui_test.c checks that every L string is covered)
-L_CHARS = " #+-./0123456789ABCDEFGHIJKLMNOPQRSTUVWXY"
+L_CHARS = " #%+-./0123456789:ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz\xc1\xc9\xcd\xd1\xd3\xda\xe1\xe9\xed\xf1\xf3\xfa"  # amb-iguos: big values
 
 
 def preset(name):

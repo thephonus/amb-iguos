@@ -26,6 +26,7 @@ enum { CMD_NOTE_ON, CMD_NOTE_OFF, CMD_ALL_OFF };
 #include "gr_engine.c"
 #include "gr_gen.c"
 #include "gr_amb.c"
+#include "gr_drift.c"
 static uint8_t nor[0x100000];
 static int st_read(uint32_t off, void *dst, uint32_t n) { memcpy(dst, nor + off, n); return 0; }
 static int st_erase(uint32_t off) { if (off & 0xFFF || off < 0x97000 || off >= 0xE0000) return -8; memset(nor + off, 0xFF, 0x1000); return 0; }

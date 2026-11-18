@@ -98,6 +98,8 @@ static void gr_keys_block(void)
                 kb_skip |= 1u << k;
                 continue;
             }
+            if (gr_index(0, P_KEYSNAP))
+                note = sc_snap(note);                             /* amb-iguos: the keys in the scale */
             if (note < 0 || note > 127)
                 continue;
             kb_part_of[k] = gr_kb_part;
@@ -145,7 +147,7 @@ static void gr_midi_block(void)
 
 /* ---------------------------------------- main loop -> audio commands --- */
 /* The main loop never touches the notes: it queues what it wants (a test note, a panic) and the audio code does it. */
-enum { CMD_NOTE_ON, CMD_NOTE_OFF, CMD_ALL_OFF };
+enum { CMD_NOTE_ON, CMD_NOTE_OFF, CMD_ALL_OFF, CMD_FREEZE };
 #define CMDQ 16u
 static struct { uint8_t type, part, a, b; } gr_cmdq[CMDQ];
 static volatile uint32_t cmd_w, cmd_r;
@@ -172,6 +174,8 @@ static void gr_cmd_block(void)
             gr_note_on(p, a, b);
         else if (t == CMD_NOTE_OFF)
             gr_note_off(p, a);
+        else if (t == CMD_FREEZE)
+            dr_freeze_set(a);
         else
             gr_all_sound_off(p);
     }

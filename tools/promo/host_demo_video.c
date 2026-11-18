@@ -47,6 +47,7 @@ static void lcd_fill(uint32_t x, uint32_t y, uint32_t w, uint32_t h, uint16_t c)
 #include "gr_engine.c"
 #include "gr_gen.c"
 #include "gr_amb.c"
+#include "gr_drift.c"
 static void midi_out_event(uint32_t pkt) { (void)pkt; }
 #include "gr_seq.c"
 #define NSLOT 8u

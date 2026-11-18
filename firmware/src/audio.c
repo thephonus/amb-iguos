@@ -28,6 +28,7 @@ static void audio_block(int32_t *out)                   /* one block, interleave
     gr_midi_block();
     gr_keys_block();
     seq_advance();                                      /* the pattern's notes, before the grains of the block */
+    dr_block();                                         /* amb-iguos: the Deriva (gr_drift.c) */
     gr_render(l, r);
     seq_mix_click(l, r);
     for (i = 0; i < BLK; i++) {

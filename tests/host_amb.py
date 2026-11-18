@@ -11,7 +11,10 @@ bad = 0
 
 
 def amb(part, note, sec, *kv):
-    out = subprocess.run(['build/host_ambdump', str(part), str(note), str(sec), *[f'{k}={v}' for k, v in kv]], capture_output=True).stdout
+    names = {'Wave': 'Onda', 'Attack': 'Ataque', 'Harmonic': 'Armónico', 'Transpose': 'Transp.', 'Detune': 'Desafinar',
+             'Pitch': 'Afinación', 'Structure': 'Estructura', 'Mod depth': 'Mod. cant.', 'Mod rate': 'Mod. vel.'}
+    args = [f'{names.get(k, k)}={v}'.encode('latin-1') for k, v in kv]          # the firmware's names are Latin-1
+    out = subprocess.run([b'build/host_ambdump', str(part).encode(), str(note).encode(), str(sec).encode(), *args], capture_output=True).stdout
     return np.frombuffer(out, dtype=np.int16).astype(float)
 
 

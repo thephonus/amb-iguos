@@ -84,7 +84,7 @@ static int gr_is_global(uint32_t p)
 {
     return p == P_VOLUME || p == P_DLYTIME || p == P_DLYFB || p == P_DLYDAMP || p == P_REVDECAY || p == P_REVDAMP ||
            p == P_TEMPO || p == P_SEQGSWING || p == P_SEQCLICK || p == P_SEQRECSTART || p == P_SEQDELAY || p == P_SEQQUANT ||
-           p == P_SEQSYNC || p == P_SEQOUT;
+           p == P_SEQSYNC || p == P_SEQOUT || (p >= P_KEY && p <= P_MACRO4);     /* amb-iguos: scale, Deriva, shimmer, macros */
 }
 
 /* the real value of a norm (x mul) of any parameter description */

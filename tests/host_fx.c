@@ -32,7 +32,7 @@ int main(void)
     printf("reverb: decay .7 damp .35\n");
     for (b = 0; b < 1400; b++) {
         memset(ol, 0, sizeof ol); memset(orr, 0, sizeof orr);
-        gr_reverb_run(b == 0 ? in : z, b == 0 ? in : z, ol, orr, 128, 700, 350);
+        gr_reverb_run(b == 0 ? in : z, b == 0 ? in : z, ol, orr, 128, 700, 350, 0, 0);
         e = 0; peak = 0;
         for (k = 0; k < 128; k++) { e += (double)ol[k] * ol[k]; if (abs(ol[k]) > peak) peak = abs(ol[k]); }
         if (b % 100 == 0) printf("  t=%4d ms rms %8.1f peak %d\n", b * 128 * 1000 / 44100, sqrt(e / 128), peak);
@@ -44,7 +44,7 @@ int main(void)
     gr_reverb_init(); memset(&rv.lfo, 0, sizeof rv.lfo);
     for (b = 0; b < 3000; b++) {
         memset(ol, 0, sizeof ol); memset(orr, 0, sizeof orr);
-        gr_reverb_run(b == 0 ? in : z, b == 0 ? in : z, ol, orr, 128, 950, 100);
+        gr_reverb_run(b == 0 ? in : z, b == 0 ? in : z, ol, orr, 128, 950, 100, 0, 0);
         e = 0; for (k = 0; k < 128; k++) e += (double)ol[k] * ol[k];
         if (b == 2999) printf("rms after 8.7 s %.1f\n", sqrt(e / 128));
     }
@@ -55,7 +55,7 @@ int main(void)
             static int32_t nz[128];
             for (k = 0; k < 128; k++) nz[k] = (rand() % 6001) - 3000;
             memset(ol, 0, sizeof ol); memset(orr, 0, sizeof orr);
-            gr_reverb_run(nz, nz, ol, orr, 128, 700, 350);
+            gr_reverb_run(nz, nz, ol, orr, 128, 700, 350, 0, 0);
             if (b > 300) for (k = 0; k < 128; k++) { ei += (double)nz[k] * nz[k]; eo += (double)ol[k] * ol[k]; n++; }
         }
         printf("steady state: input rms %.0f, reverb output rms %.0f (gain %.2f)\n", sqrt(ei / n), sqrt(eo / n), sqrt(eo / ei));

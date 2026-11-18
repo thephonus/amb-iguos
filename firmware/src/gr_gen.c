@@ -122,6 +122,10 @@ static int32_t gg_pattern(uint32_t pattern, uint32_t step)
     case 2: return major[step % 8u];
     case 3: return minor[step % 8u];
     case 4: return penta[step % 16u];
+    case 5: {                                                     /* amb-iguos: up and down the scale (SCL) */
+        uint32_t m = gr_index(0, P_MODE), n = GR_MODE_N[m], cyc = 2u * n, s = step % cyc, d = s <= n ? s : cyc - s;
+        return d >= n ? 12 : GR_MODE_DEG[m][d];
+    }
     default: return 0;
     }
 }
@@ -451,6 +455,7 @@ static void gg_fx(const int32_t *v, int16_t *o, uint32_t n)
 }
 
 #include "gr_gen2.c"
+#include "gr_gen3.c"                       /* amb-iguos: the cinema generators */
 
 /* ----------------------------------------------------------- driver --- */
 /* The Generate page's settings of a part */
@@ -547,6 +552,11 @@ static uint32_t gr_gen_render(uint32_t part, int16_t *dst)
     case GT_DRUMS: gg_drums(v, dst, total); break;
     case GT_BOWWIND: gg_bowwind(v, dst, total); break;
     case GT_DUST: gg_dust(v, dst, total); break;
+    case GT_BRAAM: gg_braam(v, dst, total); break;
+    case GT_SWELL: gg_swell(v, dst, total); break;
+    case GT_TENSION: gg_tension(v, dst, total); break;
+    case GT_IMPACT: gg_impact(v, dst, total); break;
+    case GT_SHEPARD: gg_shepard(v, dst, total); break;
     default: gg_fx(v, dst, total); break;
     }
     gg_finish(dst, frames, loop);

@@ -22,6 +22,7 @@ static void fmt_fix(char *b, int32_t v, int decimals) { (void)b; (void)v; (void)
 #include "gr_engine.c"
 #include "gr_gen.c"
 #include "gr_amb.c"
+#include "gr_drift.c"
 
 static uint32_t blockno;
 typedef struct { uint32_t block, pkt; } ev_t;

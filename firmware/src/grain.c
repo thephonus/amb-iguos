@@ -74,6 +74,7 @@ struct { uint32_t magic, failed, pending; } bootguard __attribute__((section(".n
 #include "gr_engine.c"
 #include "gr_gen.c"
 #include "gr_amb.c"
+#include "gr_drift.c"                     /* amb-iguos: scale, Deriva, Freeze */
 
 /* ------------------------------------------------------- USB, MIDI --- */
 #include "usb.c"

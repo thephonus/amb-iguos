@@ -22,45 +22,51 @@ DIVS = [("8 bars", 49152, 0), ("4 bars", 24576, 0), ("3 bars", 18432, 0), ("2 ba
         ("1/2", 3072, 0), ("1/4.", 2304, 0), ("1/2T", 2048, 1), ("1/4", 1536, 0), ("1/8.", 1152, 0), ("1/4T", 1024, 1),
         ("1/8", 768, 0), ("1/16.", 576, 0), ("1/8T", 512, 1), ("1/16", 384, 0), ("1/16T", 256, 1), ("1/32", 192, 0)]
 
+# the scales of amb-iguos: name, the semitones of its degrees from the tonic
+MODES = [("Mayor", [0, 2, 4, 5, 7, 9, 11]), ("Menor", [0, 2, 3, 5, 7, 8, 10]), ("Dórico", [0, 2, 3, 5, 7, 9, 10]),
+         ("Frigio", [0, 1, 3, 5, 7, 8, 10]), ("Lidio", [0, 2, 4, 6, 7, 9, 11]), ("Mixolidio", [0, 2, 4, 5, 7, 9, 10]),
+         ("Locrio", [0, 1, 3, 5, 6, 8, 10]), ("Menor arm.", [0, 2, 3, 5, 7, 8, 11]), ("Penta may.", [0, 2, 4, 7, 9]),
+         ("Penta men.", [0, 3, 5, 7, 10]), ("Hirajoshi", [0, 2, 3, 7, 8]), ("Tonos ent.", [0, 2, 4, 6, 8, 10])]
+
 PARAMS = [
     # ---- per part: grain
-    ("POSITION", "Position", 0, 1, .25, "L", "pct", 0, 1, 1000),
-    ("SIZE", "Size", 5, 1000, 100, "E", "ms", 0, 17, 16),
-    ("DENSITY", "Density", 1, 200, 40, "E", "persec", 0, 18, 256),
-    ("SPREAD", "Spread", 0, 1, .05, "L", "pct", 0, 70, 1000),
-    ("SCAN", "Scan", -2, 2, 0, "L", "speed", 0, 75, 1000),
-    ("JITTER", "Jitter", 0, 1, .3, "L", "pct", 0, 76, 1000),
-    ("PITCHRND", "Pitch rnd", 0, 12, 0, "L", "semi", 0, 77, 256),
-    ("PAN", "Pan", 0, 1, .5, "L", "pct", 0, 78, 1000),
+    ("POSITION", "Posición", 0, 1, .25, "L", "pct", 0, 1, 1000),
+    ("SIZE", "Tamaño", 5, 1000, 100, "E", "ms", 0, 17, 16),
+    ("DENSITY", "Densidad", 1, 200, 40, "E", "persec", 0, 18, 256),
+    ("SPREAD", "Esparcir", 0, 1, .05, "L", "pct", 0, 70, 1000),
+    ("SCAN", "Escaneo", -2, 2, 0, "L", "speed", 0, 75, 1000),
+    ("JITTER", "Irregular", 0, 1, .3, "L", "pct", 0, 76, 1000),
+    ("PITCHRND", "Afin. azar", 0, 12, 0, "L", "semi", 0, 77, 256),
+    ("PAN", "Panorama", 0, 1, .5, "L", "pct", 0, 78, 1000),
     # ---- voice
-    ("ATTACK", "Attack", 1, 5000, 20, "E", "ms", 0, 73, 16),
+    ("ATTACK", "Ataque", 1, 5000, 20, "E", "ms", 0, 73, 16),
     ("RELEASE", "Release", 5, 8000, 400, "E", "ms", 0, 72, 16),
-    ("REVERSE", "Reverse", 0, 1, 0, "L", "pct", 0, 79, 1000),
-    ("TRANSPOSE", "Transpose", -24, 24, 0, "L", "semi", 48, 255, 256),
-    ("LEVEL", "Level", 0, 1, .8, "L", "pct", 0, 7, 1000),
-    ("VOLUME", "Master", 0, 1, .7, "L", "pct", 0, 24, 1000),
+    ("REVERSE", "Reverso", 0, 1, 0, "L", "pct", 0, 79, 1000),
+    ("TRANSPOSE", "Transp.", -24, 24, 0, "L", "semi", 48, 255, 256),
+    ("LEVEL", "Nivel", 0, 1, .8, "L", "pct", 0, 7, 1000),
+    ("VOLUME", "Volumen", 0, 1, .7, "L", "pct", 0, 24, 1000),
     # ---- effects
-    ("DLYTIME", "Dly time", 10, 700, 375, "E", "ms", 0, 12, 16),
-    ("DLYFB", "Dly fdbk", 0, .9, .45, "L", "pct", 0, 13, 1000),
-    ("DLYDAMP", "Dly damp", 0, 1, .3, "L", "pct", 0, 14, 1000),
-    ("DLYSEND", "Dly send", 0, 1, .2, "L", "pct", 0, 93, 1000),
-    ("REVDECAY", "Rev decay", .1, .95, .7, "L", "plain", 0, 15, 1000),
-    ("REVDAMP", "Rev damp", 0, .9, .35, "L", "pct", 0, 16, 1000),
-    ("REVSEND", "Rev send", 0, 1, .25, "L", "pct", 0, 91, 1000),
+    ("DLYTIME", "Tiempo", 10, 700, 375, "E", "ms", 0, 12, 16),
+    ("DLYFB", "Repetic.", 0, .9, .45, "L", "pct", 0, 13, 1000),
+    ("DLYDAMP", "Oscurecer", 0, 1, .3, "L", "pct", 0, 14, 1000),
+    ("DLYSEND", "Delay", 0, 1, .2, "L", "pct", 0, 93, 1000),
+    ("REVDECAY", "Cola", .1, .95, .7, "L", "plain", 0, 15, 1000),
+    ("REVDAMP", "Oscurecer", 0, .9, .35, "L", "pct", 0, 16, 1000),
+    ("REVSEND", "Reverb", 0, 1, .25, "L", "pct", 0, 91, 1000),
     # ---- filter, LFOs
-    ("FTYPE", "Filter", 0, 4, 0, "L", "choice", 4, 255, 1, ["Off", "Vintage 24", "Res LP", "Res BP", "Res HP"]),
-    ("CUTOFF", "Cutoff", 30, 18000, 2000, "E", "hz", 0, 74, 16),
+    ("FTYPE", "Filtro", 0, 4, 0, "L", "choice", 4, 255, 1, ["Sin filtro", "Vintage 24", "Paso bajo", "Paso banda", "Paso alto"]),
+    ("CUTOFF", "Corte", 30, 18000, 2000, "E", "hz", 0, 74, 16),
     ("RESO", "Reso", 0, 1, .25, "L", "pct", 0, 71, 1000),
-    ("DRIVE", "Drive", 0, 1, .2, "L", "pct", 0, 19, 1000),
-    ("L1WAVE", "L1 wave", 0, 23, 0, "L", "choice", 23, 255, 1, LFO_SHAPES),
-    ("L1RATE", "L1 rate", .01, 40, .5, "E", "hz", 0, 20, 256),
-    ("L1DEPTH", "L1 depth", -1, 1, .3, "L", "bipolar", 0, 21, 1000),
-    ("L1DEST", "L1 dest", 0, 28, 0, "L", "dest", 28, 255, 1),
-    ("L2WAVE", "L2 wave", 0, 23, 2, "L", "choice", 23, 255, 1, LFO_SHAPES),
-    ("L2RATE", "L2 rate", .01, 40, .15, "E", "hz", 0, 22, 256),
-    ("L2DEPTH", "L2 depth", -1, 1, .3, "L", "bipolar", 0, 23, 1000),
-    ("L2DEST", "L2 dest", 0, 28, 0, "L", "dest", 28, 255, 1),
-    ("MIDICH", "MIDI ch", 1, 16, 1, "L", "chan", 15, 255, 1),
+    ("DRIVE", "Saturar", 0, 1, .2, "L", "pct", 0, 19, 1000),
+    ("L1WAVE", "Forma", 0, 23, 0, "L", "choice", 23, 255, 1, LFO_SHAPES),
+    ("L1RATE", "Velocidad", .01, 40, .5, "E", "hz", 0, 20, 256),
+    ("L1DEPTH", "Cantidad", -1, 1, .3, "L", "bipolar", 0, 21, 1000),
+    ("L1DEST", "Destino", 0, 28, 0, "L", "dest", 28, 255, 1),
+    ("L2WAVE", "Forma", 0, 23, 2, "L", "choice", 23, 255, 1, LFO_SHAPES),
+    ("L2RATE", "Velocidad", .01, 40, .15, "E", "hz", 0, 22, 256),
+    ("L2DEPTH", "Cantidad", -1, 1, .3, "L", "bipolar", 0, 23, 1000),
+    ("L2DEST", "Destino", 0, 28, 0, "L", "dest", 28, 255, 1),
+    ("MIDICH", "Canal MIDI", 1, 16, 1, "L", "chan", 15, 255, 1),
     # ---- the sequencer: per part, then shared
     ("SEQLEN", "Length", 1, 64, 16, "L", "num", 63, 255, 1),
     ("SEQDIV", "Division", 0, len(DIVS) - 1, [d[0] for d in DIVS].index("1/16"), "L", "choice", len(DIVS) - 1, 255, 1,
@@ -73,28 +79,48 @@ PARAMS = [
     ("SEQRECSTART", "Rec start", 0, 2, 0, "L", "choice", 2, 255, 1, ["First note", "Count-in", "Step"]),
     ("SEQDELAY", "Rec delay", 0, 10, 3, "L", "num", 10, 255, 1),
     ("SEQSTOP", "Stop", 0, 1, 0, "L", "choice", 1, 255, 1, ["Release", "Cut"]),
-    ("LATCH", "Key hold", 0, 1, 0, "L", "choice", 1, 255, 1, ["Off", "Latch"]),
+    ("LATCH", "Mantener", 0, 1, 0, "L", "choice", 1, 255, 1, ["No", "Sí"]),
     # ---- the Drone and Pad parts (3 and 4): after the layers of the Sonicware LIVEN Ambient O
-    ("AWAVE", "Wave", 1, 32, 1, "L", "num", 31, 255, 1),
-    ("AHARM", "Harmonic", 0, 127, 32, "L", "num", 127, 255, 1),
-    ("ASTRUCT", "Structure", 0, 1, 0, "L", "choice", 1, 255, 1, ["1", "2"]),
-    ("APITCH", "Pitch", -24, 24, 0, "L", "semi", 480, 255, 10),
-    ("ADETUNE", "Detune", -50, 50, 8, "L", "num", 100, 255, 1),
+    ("AWAVE", "Onda", 1, 32, 1, "L", "num", 31, 255, 1),
+    ("AHARM", "Armónico", 0, 127, 32, "L", "num", 127, 255, 1),
+    ("ASTRUCT", "Estructura", 0, 1, 0, "L", "choice", 1, 255, 1, ["1", "2"]),
+    ("APITCH", "Afinación", -24, 24, 0, "L", "semi", 480, 255, 10),
+    ("ADETUNE", "Desafinar", -50, 50, 8, "L", "num", 100, 255, 1),
     ("ABAL", "Balance", -63, 63, 0, "L", "num", 126, 255, 1),
-    ("AMODRATE", "Mod rate", .02, 20, .4, "E", "hz", 0, 255, 1000),
-    ("AMODDEPTH", "Mod depth", 0, 1, .3, "L", "pct", 0, 255, 1000),
-    ("AMODSHAPE", "Mod shape", 0, 23, 0, "L", "choice", 23, 255, 1, LFO_SHAPES),
-    ("AVOICE", "Voice mode", 0, 3, 0, "L", "choice", 3, 255, 1, ["Poly", "Mono", "Legato", "Unison"]),
+    ("AMODRATE", "Mod. vel.", .02, 20, .4, "E", "hz", 0, 255, 1000),
+    ("AMODDEPTH", "Mod. cant.", 0, 1, .3, "L", "pct", 0, 255, 1000),
+    ("AMODSHAPE", "Mod. forma", 0, 23, 0, "L", "choice", 23, 255, 1, LFO_SHAPES),
+    ("AVOICE", "Modo voz", 0, 3, 0, "L", "choice", 3, 255, 1, ["Poli", "Mono", "Legato", "Unísono"]),
     ("AGLIDE", "Glide", 0, 10000, 0, "L", "ms", 0, 255, 1),
-    ("AUNIDET", "Uni detune", 0, 20, 8, "L", "num", 20, 255, 1),
-    ("AATK", "Attack", 1, 10000, 2000, "E", "ms", 0, 255, 16),
+    ("AUNIDET", "Unísono", 0, 20, 8, "L", "num", 20, 255, 1),
+    ("AATK", "Ataque", 1, 10000, 2000, "E", "ms", 0, 255, 16),
     ("AREL", "Release", 5, 20000, 4000, "E", "ms", 0, 255, 16),
-    ("APAN", "Pan", 0, 1, .5, "L", "pan", 0, 255, 1000),
+    ("APAN", "Panorama", 0, 1, .5, "L", "pan", 0, 255, 1000),
     ("SEQQUANT", "Quantize", 0, 1, 1, "L", "choice", 1, 255, 1, ["Off", "On"]),
     ("SEQSYNC", "Sync", 0, 1, 0, "L", "choice", 1, 255, 1, ["Internal", "MIDI clock"]),
     ("SEQOUT", "MIDI out", 0, 2, 0, "L", "choice", 2, 255, 1, ["Off", "Notes", "Notes+clock"]),
+    # ---- amb-iguos: the scale, the drift, the shimmer and the four macros (all shared)
+    ("KEY", "Tónica", 0, 11, 2, "L", "choice", 11, 255, 1, ["C", "C#", "D", "Eb", "E", "F", "F#", "G", "Ab", "A", "Bb", "B"]),
+    ("MODE", "Modo", 0, len(MODES) - 1, 5, "L", "choice", len(MODES) - 1, 255, 1, [m[0] for m in MODES]),
+    ("KEYSNAP", "Teclas", 0, 1, 1, "L", "choice", 1, 255, 1, ["Libres", "En escala"]),
+    ("DRATE", "Ritmo", .3, 20, 3, "E", "num", 0, 255, 100),
+    ("DPROB", "Densidad", 0, 1, .7, "L", "pct", 0, 255, 1000),
+    ("DLEN", "Duración", .5, 30, 6, "E", "num", 0, 255, 100),
+    ("DCHORD", "Acorde", 1, 4, 2, "L", "num", 3, 255, 1),
+    ("DOCT", "Octava", 2, 6, 4, "L", "num", 4, 255, 1),
+    ("DRANGE", "Rango", 1, 4, 2, "L", "num", 3, 255, 1),
+    ("DLAYERS", "Capas", 0, 2, 2, "L", "choice", 2, 255, 1, ["A", "B", "A + B"]),
+    ("DDRONE", "Drone", 0, 2, 1, "L", "choice", 2, 255, 1, ["No", "Tónica", "Tónica+5ª"]),
+    ("DEVOL", "Evolución", 0, 1, .4, "L", "pct", 0, 255, 1000),
+    ("DESPD", "Vel. evol.", .005, 1, .05, "E", "hz", 0, 255, 1000),
+    ("SHIMMER", "Shimmer", 0, 1, .2, "L", "pct", 0, 95, 1000),
+    ("SHINT", "Intervalo", 0, 3, 0, "L", "choice", 3, 255, 1, ["+12", "+7", "+19", "-12"]),
+    ("MACRO1", "Textura", -1, 1, 0, "L", "bipolar", 0, 102, 1000),
+    ("MACRO2", "Brillo", -1, 1, 0, "L", "bipolar", 0, 103, 1000),
+    ("MACRO3", "Espacio", -1, 1, 0, "L", "bipolar", 0, 104, 1000),
+    ("MACRO4", "Movimiento", -1, 1, 0, "L", "bipolar", 0, 105, 1000),
 ]
-SFX = {"TEMPO": " BPM", "SEQGATE": "%", "SEQDELAY": " s", "APITCH": "", "ADETUNE": " ct", "AUNIDET": " ct"}
+SFX = {"DRATE": " s", "DLEN": " s", "DOCT": "", "DRANGE": " oct", "DCHORD": "", "TEMPO": " BPM", "SEQGATE": "%", "SEQDELAY": " s", "APITCH": "", "ADETUNE": " ct", "AUNIDET": " ct"}
 
 # what an LFO can control (index 0 = Off); the same list as the Granular synth
 LFO_DESTS = ["NONE", "CUTOFF", "RESO", "DRIVE", "POSITION", "SIZE", "DENSITY", "SPREAD", "SCAN", "JITTER", "PITCHRND",
@@ -113,7 +139,7 @@ ACC = [(73, "AATK"), (72, "AREL"), (74, "CUTOFF"), (71, "RESO"), (19, "DRIVE"), 
 
 # sample generators: label, min, max, default, curve, unit, steps, mul, suffix[, choice labels]
 WAVES = ["Saw", "Square", "Triangle", "Sine"]
-PATTERNS = ["Single", "Octaves", "Major", "Minor", "Pentatonic"]
+PATTERNS = ["Una", "Octavas", "Mayor", "Menor", "Pentatónica", "Escala"]
 VARIATION = ("Variation", 0, 99, 1, "L", "num", 99, 1, "")
 GENS = [
     ("VA", 1, [
@@ -128,11 +154,11 @@ GENS = [
         ("Vibrato", 0, 1, .3, "L", "num", 0, 1000, ""), ("Breath", 0, 1, .1, "L", "num", 0, 1000, ""),
         ("Bright", 0, 1, .5, "L", "num", 0, 1000, ""), VARIATION]),
     ("Pluck", 0, [
-        ("Pattern", 0, 4, 4, "L", "choice", 4, 1, "", PATTERNS), ("Notes", 1, 16, 8, "L", "num", 15, 1, ""),
+        ("Pattern", 0, 5, 4, "L", "choice", 5, 1, "", PATTERNS), ("Notes", 1, 16, 8, "L", "num", 15, 1, ""),
         ("Sustain", 0, 1, .8, "L", "num", 0, 1000, ""), ("Bright", 0, 1, .7, "L", "num", 0, 1000, ""),
         ("Damping", 0, 1, .4, "L", "num", 0, 1000, ""), VARIATION]),
     ("FM", 0, [
-        ("Pattern", 0, 4, 0, "L", "choice", 4, 1, "", PATTERNS), ("Notes", 1, 16, 4, "L", "num", 15, 1, ""),
+        ("Pattern", 0, 5, 0, "L", "choice", 5, 1, "", PATTERNS), ("Notes", 1, 16, 4, "L", "num", 15, 1, ""),
         ("Ratio", .5, 9, 3.5, "L", "num", 34, 1000, "x"), ("Index", 0, 12, 4, "L", "num", 0, 1000, ""),
         ("Index env", 0, 1, .7, "L", "num", 0, 1000, ""), ("Feedback", 0, 1, .1, "L", "num", 0, 1000, ""),
         ("Decay", .02, 1, .5, "E", "num", 0, 1000, "")]),
@@ -145,7 +171,7 @@ GENS = [
         ("Sweep", 0, 1, .5, "L", "num", 0, 1000, ""), ("Speed", .02, 2, .15, "E", "hz", 0, 1000, ""),
         ("Hum", 0, 1, .3, "L", "num", 0, 1000, ""), ("Crackle", 0, 1, .1, "L", "num", 0, 1000, ""), VARIATION]),
     ("FX", 0, [
-        ("Kind", 0, 4, 1, "L", "choice", 4, 1, "", ["Riser", "Laser", "Impact", "Siren", "Glitch"]),
+        ("Kind", 0, 4, 1, "L", "choice", 4, 1, "", ["Subida", "Láser", "Golpe", "Sirena", "Glitch"]),
         ("Pitch", 40, 4000, 300, "E", "hz", 0, 1, ""), ("Range", 0, 6, 3, "L", "num", 0, 1000, " oct"),
         ("Rate", .2, 30, 4, "E", "hz", 0, 1000, ""), ("Noise", 0, 1, .15, "L", "num", 0, 1000, ""),
         ("Crush", 0, 1, 0, "L", "num", 0, 1000, ""), VARIATION]),
@@ -160,7 +186,7 @@ GENS = [
         ("Tone", 0, 1, .5, "L", "num", 0, 1000, ""), ("Snap", 0, 1, .5, "L", "num", 0, 1000, ""),
         ("Hits", 1, 8, 4, "L", "num", 7, 1, ""), ("Humanize", 0, 1, .3, "L", "num", 0, 1000, ""), VARIATION]),
     ("Bow/Wind", 1, [
-        ("Mode", 0, 2, 0, "L", "choice", 2, 1, "", ["Bowed", "Flute", "Clarinet"]),
+        ("Mode", 0, 2, 0, "L", "choice", 2, 1, "", ["Arco", "Flauta", "Clarinete"]),
         ("Pressure", 0, 1, .6, "L", "num", 0, 1000, ""), ("Bright", 0, 1, .6, "L", "num", 0, 1000, ""),
         ("Position", 0, 1, .5, "L", "num", 0, 1000, ""), ("Noise", 0, 1, .2, "L", "num", 0, 1000, ""),
         ("Vibrato", 0, 1, .3, "L", "num", 0, 1000, ""), ("Attack", .02, 1, .2, "E", "num", 0, 1000, " s"), VARIATION]),
@@ -169,16 +195,62 @@ GENS = [
         ("Decay", .005, .5, .05, "E", "num", 0, 1000, " s"), ("Spread", 0, 1, .4, "L", "num", 0, 1000, ""),
         ("Dynamics", 0, 1, .6, "L", "num", 0, 1000, ""), ("Clump", 0, 1, .3, "L", "num", 0, 1000, ""),
         ("Bed", 0, 1, .1, "L", "num", 0, 1000, ""), VARIATION]),
+    # ---- amb-iguos: the cinema generators (gr_gen3.c)
+    ("Braam", 1, [
+        ("Detune", 0, 60, 18, "L", "num", 0, 1, " ct"), ("Swell", 0, 1, .6, "L", "num", 0, 1000, ""),
+        ("Bright", 0, 1, .5, "L", "num", 0, 1000, ""), ("Drive", 0, 1, .4, "L", "num", 0, 1000, ""),
+        ("Sub", 0, 1, .5, "L", "num", 0, 1000, ""), VARIATION]),
+    ("Swell", 0, [
+        ("Color", 200, 9000, 2500, "E", "hz", 0, 1, ""), ("Noise", 0, 1, .35, "L", "num", 0, 1000, ""),
+        ("Curve", 0, 1, .5, "L", "num", 0, 1000, ""), ("Partials", 2, 12, 8, "L", "num", 10, 1, ""), VARIATION]),
+    ("Tension", 1, [
+        ("Voices", 2, 6, 4, "L", "num", 4, 1, ""), ("Width", .2, 6, 1.5, "L", "num", 0, 100, " st"),
+        ("Tremolo", .5, 14, 6, "E", "hz", 0, 1000, ""), ("Trem depth", 0, 1, .4, "L", "num", 0, 1000, ""),
+        ("Bright", 300, 8000, 1800, "E", "hz", 0, 1, ""), VARIATION]),
+    ("Impact", 0, [
+        ("Sub", 0, 1, .8, "L", "num", 0, 1000, ""), ("Body", 60, 2000, 180, "E", "hz", 0, 1, ""),
+        ("Noise", 0, 1, .6, "L", "num", 0, 1000, ""), ("Tail", 0, 1, .5, "L", "num", 0, 1000, ""),
+        ("Drive", 0, 1, .3, "L", "num", 0, 1000, ""), VARIATION]),
+    ("Shepard", 1, [
+        ("Direction", 0, 1, 0, "L", "choice", 1, 1, "", ["Sube", "Baja"]), ("Cycles", 1, 4, 1, "L", "num", 3, 1, ""),
+        ("Bright", 0, 1, .2, "L", "num", 0, 1000, ""), ("Voices", 4, 8, 6, "L", "num", 4, 1, ""), VARIATION]),
 ]
 GEN_LENGTH = ("Length", .25, 2.0, 1.5, "E", "num", 0, 1000, " s")      # at 22.05 kHz, 2 s fill a part
+
+# what the screen shows (the C identifiers keep the English names)
+GEN_ES = {"Vowel": "Vocal", "Pluck": "Pulsado", "Additive": "Aditivo", "Texture": "Textura", "Wavetable": "Wavetable",
+          "Drums": "Percusión", "Bow/Wind": "Arco/Viento", "Dust": "Polvo", "Swell": "Swell", "Tension": "Tensión",
+          "Impact": "Impacto"}
+GP_ES = {"Wave 1": "Onda 1", "Wave 2": "Onda 2", "Interval": "Intervalo", "Detune": "Desafinar", "Osc mix": "Mezcla",
+         "Cutoff": "Corte", "Filt env": "Env. filtro", "Vowel 1": "Vocal 1", "Vowel 2": "Vocal 2", "Morphs": "Cambios",
+         "Formant": "Formante", "Breath": "Aliento", "Bright": "Brillo", "Variation": "Variación", "Pattern": "Patrón",
+         "Notes": "Notas", "Damping": "Apagado", "Ratio": "Ratio", "Index": "Índice", "Index env": "Env. índice",
+         "Feedback": "Feedback", "Decay": "Caída", "Partials": "Parciales", "Even": "Pares", "Stretch": "Estirar",
+         "Motion": "Movimiento", "Width": "Ancho", "Sweep": "Barrido", "Speed": "Velocidad", "Hum": "Zumbido",
+         "Crackle": "Crepitar", "Kind": "Tipo", "Pitch": "Tono", "Range": "Rango", "Rate": "Velocidad", "Noise": "Ruido",
+         "Crush": "Bits", "Table": "Tabla", "Position": "Posición", "Sub": "Sub", "Tune": "Afinar", "Tone": "Tono",
+         "Snap": "Chasquido", "Hits": "Golpes", "Humanize": "Humanizar", "Mode": "Modo", "Pressure": "Presión",
+         "Vibrato": "Vibrato", "Attack": "Ataque", "Density": "Densidad", "Body": "Cuerpo", "Spread": "Esparcir",
+         "Dynamics": "Dinámica", "Clump": "Grupos", "Bed": "Fondo", "Swell": "Crecida", "Drive": "Saturar",
+         "Color": "Color", "Curve": "Curva", "Voices": "Voces", "Tremolo": "Trémolo", "Trem depth": "Prof. trém.",
+         "Tail": "Cola", "Direction": "Dirección", "Cycles": "Ciclos", "Length": "Duración"}
+
+
+def cstr(t):
+    """a C string literal in Latin-1 (the fonts' encoding): non-ASCII as octal escapes"""
+    out = ""
+    for ch in t:
+        o = ord(ch)
+        out += ch if 32 <= o < 127 and ch not in '"\\' else (f"\\{o:03o}" if o < 256 else "?")
+    return '"' + out + '"'
 
 
 def pline(label, mn, mx, df, cv, unit, steps, cc, mul, sfx, labs):
     mni, mxi = int(round(mn * mul)), int(round(mx * mul))
     lg = int(round(65536 * math.log2(mx / mn))) if cv == "E" else 0
     dn = int(round(65535 * ((math.log(df / mn) / math.log(mx / mn)) if cv == "E" else (df - mn) / (mx - mn))))
-    return (f'    {{"{label}", {mni}, {mxi}, {dn}, {lg}, {mul}, {steps}, {cc}, GR_{cv}, GR_U_{unit.upper()}, {labs}, '
-            f'"{sfx}"}},')
+    return (f'    {{{cstr(label)}, {mni}, {mxi}, {dn}, {lg}, {mul}, {steps}, {cc}, GR_{cv}, GR_U_{unit.upper()}, {labs}, '
+            f'{cstr(sfx)}}},')
 
 
 def arr(name, ctype, vals, per=12):
@@ -258,7 +330,7 @@ def main(path):
     L.append("")
     for p in PARAMS:
         if len(p) > 10:
-            labs = ", ".join(f'"{s}"' for s in p[10])
+            labs = ", ".join(cstr(s) for s in p[10])
             L.append(f"static const char *const GR_CH_{p[0]}[] = {{{labs}}};")
     L.append("")
     L.append("static const gr_pinfo_t GR_PINFO[P_COUNT] = {")
@@ -268,22 +340,26 @@ def main(path):
     L.append("};")
     L.append("")
     ident = lambda g: "".join(ch for ch in g[0] if ch.isalnum())
+    L.append(f"#define GR_NMODES {len(MODES)}")
+    L.append("static const uint8_t GR_MODE_N[GR_NMODES] = {" + ", ".join(str(len(m[1])) for m in MODES) + "};")
+    L.append("static const uint8_t GR_MODE_DEG[GR_NMODES][7] = {" +
+             ", ".join("{" + ", ".join(str(x) for x in (m[1] + [12] * 7)[:7]) + "}" for m in MODES) + "};")
     L.append(f"#define GEN_COUNT {len(GENS)}")
     L.append("enum { " + ", ".join(f"GT_{ident(g).upper()}" for g in GENS) + " };")
     for g in GENS:
         for k, q in enumerate(g[2]):
             if len(q) > 9:
-                labs = ", ".join(f'"{x}"' for x in q[9])
+                labs = ", ".join(cstr(x) for x in q[9])
                 L.append(f"static const char *const GR_GL_{ident(g)}_{k}[] = {{{labs}}};")
         L.append(f"static const gr_pinfo_t GR_GP_{ident(g)}[] = {{")
         for k, q in enumerate(g[2]):
-            L.append(pline(q[0], q[1], q[2], q[3], q[4], q[5], q[6], 255, q[7], q[8], f"GR_GL_{ident(g)}_{k}" if len(q) > 9 else "0"))
+            L.append(pline(GP_ES.get(q[0], q[0]), q[1], q[2], q[3], q[4], q[5], q[6], 255, q[7], q[8], f"GR_GL_{ident(g)}_{k}" if len(q) > 9 else "0"))
         L.append("};")
     L.append("static const gr_gentype_t GR_GENTYPES[GEN_COUNT] = {")
     for g in GENS:
-        L.append(f'    {{"{g[0]}", GR_GP_{ident(g)}, {len(g[2])}, {g[1]}}},')
+        L.append(f'    {{{cstr(GEN_ES.get(g[0], g[0]))}, GR_GP_{ident(g)}, {len(g[2])}, {g[1]}}},')
     L.append("};")
-    L.append(pline(*GEN_LENGTH[:7], 255, *GEN_LENGTH[7:], "0").replace("{", "static const gr_pinfo_t GR_GENLEN = {", 1).rstrip(",") + ";")
+    L.append(pline(GP_ES["Length"], *GEN_LENGTH[1:7], 255, *GEN_LENGTH[7:], "0").replace("{", "static const gr_pinfo_t GR_GENLEN = {", 1).rstrip(",") + ";")
     open(path, "w").write("\n".join(L) + "\n")
     print(f"grain tables + {len(PARAMS)} parameters -> {path}")
 

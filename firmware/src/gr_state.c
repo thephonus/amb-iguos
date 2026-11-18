@@ -6,12 +6,12 @@
  * written). A generated sound is remade
  * from its settings with the same result. Flash writes stop the audio for a moment, so nothing is saved while a note
  * sounds. */
-#define ST_VER 7u
+#define ST_VER 0xA1u                             /* amb-iguos 0.1 (Mini-Grain was 7) */
 #define BLOB_MAX ST_PAYLOAD_MAX                  /* a preset's room: an object's payload */
 #define PRESETS_PER_OBJ 1u
 /* header 2 + per part: params + a pattern (8 + 64 x 8 + 1 + 24 x 4); the granular parts also generator type, length,
  * settings and source */
-_Static_assert(2u + NPART * (P_COUNT * 2u + 8u + SEQ_STEPS * 8u + 1u + SEQ_LOCKS * 4u) +
+_Static_assert(2u + NPART * (P_COUNT * 2u) +
                    NGPART * (1u + 2u + GEN_COUNT * 8u * 2u + 2u) <= BLOB_MAX, "a full state must fit a preset's room");
 
 static uint8_t blob[BLOB_MAX];
@@ -26,7 +26,7 @@ static uint32_t get32(const uint8_t *p) { return get16(p) | get16(p + 2) << 16; 
 /* the state -> b; returns its length */
 static uint32_t state_pack(uint8_t *b)
 {
-    uint32_t part, i, t, k = 0, mask_at;
+    uint32_t part, i, t, k = 0;
     b[k++] = (uint8_t)ST_VER;
     b[k++] = 1;
     for (part = 0; part < NPART; part++) {
@@ -42,24 +42,6 @@ static uint32_t state_pack(uint8_t *b)
             b[k++] = gr_src_kind[part];
             b[k++] = gr_src_slot[part];
         }
-        mask_at = k;                              /* the pattern: a bitmap of the steps in use, then those steps */
-        for (i = 0; i < 8u; i++)
-            b[k++] = 0;
-        for (i = 0; i < SEQ_STEPS; i++)
-            if (seq_tr[part].notes[i] != NO_NOTES || seq_tr[part].meta[i] != seq_empty_meta()) {
-                b[mask_at + i / 8u] |= (uint8_t)(1u << (i % 8u));
-                put32(b + k, seq_tr[part].notes[i]);
-                put32(b + k + 4u, seq_tr[part].meta[i]);
-                k += 8u;
-            }
-        mask_at = k++;                            /* the locks in use */
-        b[mask_at] = 0;
-        for (i = 0; i < SEQ_LOCKS; i++)
-            if (seq_tr[part].locks[i] != LOCK_FREE) {
-                put32(b + k, seq_tr[part].locks[i]);
-                k += 4u;
-                b[mask_at]++;
-            }
     }
     return k;
 }
@@ -67,11 +49,11 @@ static uint32_t state_pack(uint8_t *b)
 /* b (len bytes) -> the state; 0, or -1 if it is not one of ours or is cut short */
 static int state_unpack(const uint8_t *b, uint32_t len)
 {
-    uint32_t part, i, t, k = 2, n;
+    uint32_t part, i, t, k = 2;
     if (len < 2u || b[0] != ST_VER || b[1] != 1)
         return -1;
     for (part = 0; part < NPART; part++) {
-        if (k + P_COUNT * 2u + (gr_ambient(part) ? 0u : 1u + 2u + GEN_COUNT * 16u + 2u) + 8u > len)
+        if (k + P_COUNT * 2u + (gr_ambient(part) ? 0u : 1u + 2u + GEN_COUNT * 16u + 2u) > len)
             return -1;
         for (i = 0; i < P_COUNT; i++, k += 2u)
             gr_set_norm(part, i, (int32_t)get16(b + k));
@@ -87,28 +69,7 @@ static int state_unpack(const uint8_t *b, uint32_t len)
             gr_src_slot[part] = b[k + 1] < NSLOT ? b[k + 1] : 0;
             k += 2u;
         }
-        seq_clear_track(part);
-        {
-            const uint8_t *mask = b + k;
-            k += 8u;
-            for (i = 0; i < SEQ_STEPS; i++)
-                if ((mask[i / 8u] >> (i % 8u)) & 1u) {
-                    if (k + 8u > len)
-                        return -1;
-                    seq_tr[part].notes[i] = get32(b + k);
-                    seq_tr[part].meta[i] = get32(b + k + 4u);
-                    k += 8u;
-                }
-        }
-        if (k + 1u > len)
-            return -1;
-        n = b[k++];
-        for (i = 0; i < n && i < SEQ_LOCKS; i++, k += 4u) {
-            if (k + 4u > len)
-                return -1;
-            seq_tr[part].locks[i] = get32(b + k);
-        }
-        seq_count_glides(part);
+        seq_clear_track(part);                    /* amb-iguos: no patterns (the Deriva plays) */
     }
     return 0;
 }

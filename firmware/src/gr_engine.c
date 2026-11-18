@@ -54,6 +54,8 @@ typedef struct {
 } gr_part_t;
 
 static gr_part_t gr_pt[NPART];
+static volatile uint8_t gr_freeze;                         /* amb-iguos: the FREEZE (gr_drift.c) */
+static int32_t dr_offset(uint32_t part, uint32_t p);       /* the Deriva's wandering (gr_drift.c) */
 static uint32_t amb_budget = AMB_BUDGET, amb_raise = 16;
 /* the drone and the pad (gr_amb.c) */
 static void amb_note_on(uint32_t part, uint32_t note, uint32_t vel);
@@ -330,6 +332,47 @@ static inline int32_t gr_modv_l(const gr_part_t *pt, const gr_pset_t *s, uint32_
     return gr_norm_to_real(p, (uint32_t)clampi((lk >= 0 ? lk : (int32_t)s->norm[p]) + off, 0, 65535));
 }
 
+/* amb-iguos: the four macros of the ESCENA (bipolar, centre = as set) and the Deriva's wandering, added to the
+ * LFOs' movement. The shared parameters take the macros once (through part 0). */
+static void gr_macros(gr_part_t *pt, uint32_t part)
+{
+    const gr_pset_t *g = &gr_ps[0];
+    int32_t tex = k2q16(g->real[P_MACRO1]), bri = k2q16(g->real[P_MACRO2]), spa = k2q16(g->real[P_MACRO3]);
+    int32_t mov = k2q16(g->real[P_MACRO4]);
+#define MAC(p, m, k) (pt->off[p] += mulq16((m), (k)))
+    if (!gr_ambient(part)) {
+        MAC(P_SIZE, tex, 30000);
+        MAC(P_DENSITY, tex, -16000);
+        MAC(P_JITTER, tex, 20000);
+        MAC(P_SPREAD, tex, 10000);
+        MAC(P_CUTOFF, bri, 30000);
+        MAC(P_SCAN, mov, 9000);
+        MAC(P_SPREAD, mov, 16000);
+        MAC(P_PITCHRND, mov, 7000);
+        pt->off[P_POSITION] += dr_offset(part, P_POSITION);
+        pt->off[P_SIZE] += dr_offset(part, P_SIZE);
+        pt->off[P_DENSITY] += dr_offset(part, P_DENSITY);
+        pt->off[P_CUTOFF] += dr_offset(part, P_CUTOFF);
+    } else {
+        MAC(P_ADETUNE, tex, 14000);
+        MAC(P_AHARM, bri, 24000);
+        MAC(P_CUTOFF, bri, 30000);
+        MAC(P_AMODDEPTH, mov, 20000);
+        pt->off[P_AHARM] += dr_offset(part, P_AHARM);
+        pt->off[P_ABAL] += dr_offset(part, P_ABAL);
+        pt->off[P_CUTOFF] += dr_offset(part, P_CUTOFF);
+        pt->off[P_ADETUNE] += dr_offset(part, P_ADETUNE);
+    }
+    MAC(P_REVSEND, spa, 26000);
+    MAC(P_DLYSEND, spa, 9000);
+    if (part == 0u) {
+        MAC(P_REVDECAY, spa, 20000);
+        MAC(P_SHIMMER, spa, 22000);
+        MAC(P_DLYFB, spa, 8000);
+    }
+#undef MAC
+}
+
 static void gr_modulate(void)
 {
     uint32_t part, p;
@@ -351,6 +394,7 @@ static void gr_modulate(void)
         gr_st.lfo[part][0] = (int16_t)((pt->lfo[0].out * pt->lfo_depth[0]) / 1000);
         gr_st.lfo[part][1] = (int16_t)((pt->lfo[1].out * pt->lfo_depth[1]) / 1000);
         gr_collect(pt, part, dest);
+        gr_macros(pt, part);
         for (p = 0; p < P_COUNT; p++) {
             if (gr_is_global(p))
                 continue;
@@ -483,7 +527,7 @@ static void gr_spawn(uint32_t part)
     uint32_t dens = (uint32_t)pt->val[P_DENSITY] ? (uint32_t)pt->val[P_DENSITY] : 256u;
     uint32_t interval = 2890137600u / dens;                             /* frames between grains, Q8 */
     int32_t jit_q15 = (pt->val[P_JITTER] * 32768) / 1000;
-    int32_t scan_step = pt->val[P_SCAN] * (int32_t)pt->scan_k;
+    int32_t scan_step = gr_freeze ? 0 : pt->val[P_SCAN] * (int32_t)pt->scan_k;
     for (vi = 0; vi < NNOTE; vi++) {
         gr_voice_t *v = &pt->v[vi];
         int spawned = 0;
@@ -790,7 +834,8 @@ static void gr_render(int32_t *outL, int32_t *outR)
         }
     }
     gr_delay_run(gr_send_dl, gr_send_dr, outL, outR, BLK, gr_pt[0].val[P_DLYTIME], gr_pt[0].val[P_DLYFB], gr_pt[0].val[P_DLYDAMP]);
-    gr_reverb_run(gr_send_rl, gr_send_rr, outL, outR, BLK, gr_pt[0].val[P_REVDECAY], gr_pt[0].val[P_REVDAMP]);
+    gr_reverb_run(gr_send_rl, gr_send_rr, outL, outR, BLK, gr_freeze ? 975 : gr_pt[0].val[P_REVDECAY], gr_pt[0].val[P_REVDAMP],
+                  gr_pt[0].val[P_SHIMMER], gr_index(0, P_SHINT));
     volume = (gr_pt[0].val[P_VOLUME] * 32768) / 1000;
     {
         int32_t step = (volume - gr_vol_q15) / BLK, gain = gr_vol_q15;

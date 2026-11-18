@@ -20,7 +20,9 @@ $CC tests/host_pitch.c -o build/host_pitch -lm
 $CC tests/host_gendump.c -o build/host_gendump -lm
 $CC tests/host_ambdump.c -o build/host_ambdump -lm
 $CC tests/host_ambclick.c -o build/host_ambclick -lm
+$CC tests/host_drift.c -o build/host_drift -lm
 echo "== engine: parameters, generators, grains, filters"; build/host_engine
+echo "== amb-iguos: scale, Deriva, Freeze, shimmer"; build/host_drift build/drift.wav
 echo "== pitch (a sine sample played on notes 48..84)"
 for n in 48 60 72 84; do build/host_pitch $n > build/p.raw; python3 - $n <<'PY'
 import sys, numpy as np
