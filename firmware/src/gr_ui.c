@@ -606,7 +606,7 @@ static void scene_strip(int32_t top)
             continue;
         x = (int32_t)((uint32_t)v * 239u / 65534u);
         band = part == 0u ? 38 : 90;
-        y = band + (int32_t)((i * 2654435761u) >> 27) - 16 + ((sin32(t * 0x02000000u + i * 0x1F000000u) * 4) >> 15);
+        y = band + (int32_t)((i * 2654435761u) >> 27) - 16 + ((sin32((t << 25) + i * 0x1F000000u) * 4) >> 15);
         c = gr_freeze ? UC_ICE : accent_of(part);
         cv_glow(x, y, 9, c, 30);
         cv_dot(x, y, 2, ux_mix(c, UC_TEXT, 40));
