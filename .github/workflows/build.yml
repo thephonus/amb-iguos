@@ -35,3 +35,15 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: gh release create "$GITHUB_REF_NAME" build/amb-iguos-*.fwsc --title "amb-iguos $GITHUB_REF_NAME" --notes "Ver README" || true
+      - name: Web installer (GitHub Pages, branch gh-pages)
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python3 tools/make_site.py build/amb-iguos.fwsc "0.1 (${GITHUB_SHA::7})" site
+          cd site
+          git init -q
+          git checkout -q -b gh-pages
+          git add -A
+          git -c user.name=github-actions -c user.email=github-actions@users.noreply.github.com commit -qm "site ${GITHUB_SHA::7}"
+          git push -qf "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" gh-pages

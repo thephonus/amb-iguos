@@ -49,18 +49,19 @@ Un punto blanco dentro de un dial indica dónde lo ha llevado ahora mismo un LFO
 
 ## Instalar
 
-1. Descarga `amb-iguos.fwsc` del último build en GitHub: pestaña **Actions** → la ejecución más reciente → artefacto **amb-iguos-fwsc**. También puedes bajarlo de **Releases** cuando haya una versión etiquetada.
-2. Si vienes de otro firmware no oficial, **vuelve primero al oficial de M-VAVE (V16)**.
-3. Carga la batería y conecta la FM-1 por USB, con un cable de datos y directa al ordenador (sin hub).
-4. Instala con `python3 tools/fm1_install.py amb-iguos.fwsc` (necesita `pip install mido python-rtmidi`). También sirve un instalador web compatible con paquetes `.fwsc`, como el del FM-1 Firmware Hub.
+**Lo más fácil: el instalador web** → **https://thephonus.github.io/amb-iguos/**
 
-**Volver al firmware oficial:** usa el actualizador de M-VAVE (M-UPGRADE) con su V16. Si se queda en negro, [FM1 Unbricker](https://quixotic7.github.io/MvaveFM1Unbricker/).
+Ábrelo en Chrome o Edge, conecta la FM-1 por USB y pulsa **Instalar**. Instala siempre la última versión compilada. Desde esa misma página puedes volver al firmware oficial (V15 / V16): solo tienes que elegir el `FM-1.fwsc` de M-VAVE.
 
-La identidad del paquete es `FM-1_946`.
+Si tienes otro firmware no oficial (JIANT, SLOOP, Felucca…), vuelve antes al oficial. Desde el oficial, desde Mini-Grain o desde otra versión de amb-iguos puedes instalar directamente.
+
+**Con Python, sin navegador:** descarga `amb-iguos.fwsc` (pestaña Actions → la ejecución más reciente → artefacto **amb-iguos-fwsc**) y ejecuta `python3 tools/fm1_install.py amb-iguos.fwsc` (necesita `pip install mido python-rtmidi`).
+
+Si se queda en negro: [FM1 Unbricker](https://quixotic7.github.io/MvaveFM1Unbricker/). La identidad del paquete es `FM-1_946`.
 
 ## Muestras propias
 
-Abre `web/index.html` en Chrome o Edge con la FM-1 conectada y arrastra tus audios: caben 7 muestras de hasta ~2 s a 22 kHz. En la FM-1 aparecen en FUENTE (EDIT): gira K1 más allá de los generadores.
+Abre **https://thephonus.github.io/amb-iguos/muestras/** (o `web/index.html`) en Chrome o Edge con la FM-1 conectada y arrastra tus audios: caben 7 muestras de hasta ~2 s a 22 kHz. En la FM-1 aparecen en FUENTE (EDIT): gira K1 más allá de los generadores.
 
 ## Compilar
 
